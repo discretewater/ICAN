@@ -309,7 +309,33 @@ export function validatePolicy(policy: unknown): InputValidationResult {
   if (!result.success) {
     const issues = result.error.issues;
 
-    if (issues.some(i => i.path.length === 0 && i.message.includes('Required'))) {
+    // Helper to recursively extract all issues with their paths
+    interface IssueInfo {
+      message: string;
+      path: (string | number)[];
+    }
+
+    function extractAllIssues(issueList: z.ZodIssue[]): IssueInfo[] {
+      const result: IssueInfo[] = [];
+      for (const issue of issueList) {
+        // @ts-expect-error - unionErrors exists on ZodInvalidUnionIssue but not on base ZodIssue
+        if (issue.unionErrors) {
+          // @ts-expect-error
+          for (const ue of issue.unionErrors) {
+            result.push(...extractAllIssues(ue.issues ?? []));
+          }
+        }
+        result.push({ message: issue.message, path: issue.path });
+      }
+      return result;
+    }
+
+    const allIssues = extractAllIssues(issues);
+    const allMessages = allIssues.map(i => i.message);
+
+    // Check for missing Statement: Statement field is undefined
+    const missingStatement = allMessages.some(m => m.includes('Required'));
+    if (missingStatement) {
       return {
         ok: false,
         classification: 'invalid',
@@ -318,7 +344,20 @@ export function validatePolicy(policy: unknown): InputValidationResult {
       };
     }
 
-    if (issues.some(i => i.path.includes('Statement'))) {
+    // Check for Statement-level type errors (not nested in a field)
+    // These issues have path = ["Statement"] (length 1), not ["Statement", "Effect"] etc.
+    const statementLevelIssues = allIssues.filter(
+      i => i.path.length === 1 && i.path[0] === 'Statement'
+    );
+
+    // Check for field-level issues (nested inside Statement)
+    // These issues have path like ["Statement", "Effect"] or ["Statement", "Action"]
+    const fieldLevelIssues = allIssues.filter(
+      i => i.path.length >= 2 && i.path[0] === 'Statement'
+    );
+
+    if (statementLevelIssues.length > 0 && fieldLevelIssues.length === 0) {
+      // Only Statement-level issues, no field-level issues → invalid_shape
       return {
         ok: false,
         classification: 'invalid',
@@ -327,6 +366,7 @@ export function validatePolicy(policy: unknown): InputValidationResult {
       };
     }
 
+    // Otherwise, it's a field value error (Effect, Action, Resource problems)
     return {
       ok: false,
       classification: 'invalid',
