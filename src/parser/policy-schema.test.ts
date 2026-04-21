@@ -468,4 +468,123 @@ describe('validatePolicy', () => {
       expect(result.reason).toBe('invalid_shape');
     }
   });
+
+  describe('invalid_field_value cases', () => {
+    it('should return invalid_field_value for invalid Effect value', () => {
+      const policy = {
+        Statement: {
+          Effect: 'Maybe',
+          Action: 's3:*',
+          Resource: '*',
+        },
+      };
+      const result = validatePolicy(policy);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.reason).toBe('invalid_field_value');
+      }
+    });
+
+    it('should return invalid_field_value when Action is a number', () => {
+      const policy = {
+        Statement: {
+          Effect: 'Allow',
+          Action: 123,
+          Resource: '*',
+        },
+      };
+      const result = validatePolicy(policy);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.reason).toBe('invalid_field_value');
+      }
+    });
+
+    it('should return invalid_field_value when Resource is an object', () => {
+      const policy = {
+        Statement: {
+          Effect: 'Allow',
+          Action: 's3:*',
+          Resource: {},
+        },
+      };
+      const result = validatePolicy(policy);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.reason).toBe('invalid_field_value');
+      }
+    });
+  });
+
+  describe('unsupported_feature cases', () => {
+    it('should return unsupported_feature for NotAction', () => {
+      const policy = {
+        Statement: {
+          Effect: 'Allow',
+          NotAction: 's3:*',
+          Resource: '*',
+        },
+      };
+      const result = validatePolicy(policy);
+      expect(result.ok).toBe(false);
+      if (!result.ok && result.classification === 'unsupported_feature') {
+        expect(result.reason).toBe('unsupported_feature');
+        expect(result.feature).toBe('NotAction');
+      }
+    });
+
+    it('should return unsupported_feature for Principal', () => {
+      const policy = {
+        Statement: {
+          Effect: 'Allow',
+          Principal: { AWS: '*' },
+          Action: 's3:*',
+          Resource: '*',
+        },
+      };
+      const result = validatePolicy(policy);
+      expect(result.ok).toBe(false);
+      if (!result.ok && result.classification === 'unsupported_feature') {
+        expect(result.reason).toBe('unsupported_feature');
+        expect(result.feature).toBe('Principal');
+      }
+    });
+  });
+
+  describe('invalid priority over unsupported', () => {
+    it('should return invalid_shape when missing required Action field', () => {
+      // When Action is missing, the Statement shape itself is invalid
+      // even though NotAction is also present (unsupported feature)
+      const policy = {
+        Statement: {
+          Effect: 'Maybe',
+          NotAction: 's3:*',
+          Resource: '*',
+        },
+      };
+      const result = validatePolicy(policy);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.reason).toBe('invalid_shape');
+      }
+    });
+
+    it('should return invalid_field_value when both invalid field and unsupported feature exist', () => {
+      // When Action is present and Statement shape is valid,
+      // but Effect is invalid - should return invalid_field_value
+      const policy = {
+        Statement: {
+          Effect: 'Maybe',
+          Action: 's3:GetObject',
+          Resource: '*',
+          NotAction: 's3:*',
+        },
+      };
+      const result = validatePolicy(policy);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.reason).toBe('invalid_field_value');
+      }
+    });
+  });
 });
