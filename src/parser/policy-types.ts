@@ -119,6 +119,50 @@ export interface InputUnsupportedResult {
 }
 
 /**
+ * StandardStatement - normalized statement format for downstream processing.
+ *
+ * This interface defines the standardized statement structure that will be
+ * produced by D02 and subsequent units. It provides stable, internal
+ * identifiers (statementId, sourcePolicyId) for multi-document merge evaluation
+ * and policy analysis.
+ *
+ * D02 IMPLEMENTATION: The generation logic for this type will be implemented
+ * in the D02 unit. For D01, this type serves as a type-level placeholder
+ * and contract declaration.
+ *
+ * Reserved fields (to be implemented in D02):
+ * - statementId: Internal stable identifier for the statement
+ * - sourcePolicyId: Stable source document identifier for multi-document merge
+ * - sourcePolicyPath: Source file path
+ * - sourcePolicyIndex: Source policy index within a document
+ * - sourceStatementIndex: Source statement index within a policy
+ */
+export interface StandardStatement {
+  /** Internal stable identifier - reserved for D02 implementation */
+  statementId: string;
+  /** Stable source document identifier for multi-document merge evaluation - reserved for D02 */
+  sourcePolicyId: string;
+  /** Source file path - reserved for D02 implementation */
+  sourcePolicyPath: string;
+  /** Source policy index within the document - reserved for D02 implementation */
+  sourcePolicyIndex: number;
+  /** Source statement index within the policy - reserved for D02 implementation */
+  sourceStatementIndex: number;
+  /** Original Sid from the input statement (if present) */
+  sid: string | undefined;
+  /** Effect value (Allow or Deny) */
+  effect: 'Allow' | 'Deny';
+  /** Normalized action strings */
+  actions: string[];
+  /** Normalized resource strings */
+  resources: string[];
+  /** Normalized condition structure */
+  conditions: Record<string, Record<string, string | string[] | boolean | boolean[]>>;
+  /** Original statement fragment for traceability */
+  raw: unknown;
+}
+
+/**
  * Supported Condition operators in phase 1.
  */
 export const SUPPORTED_CONDITION_OPERATORS = [
