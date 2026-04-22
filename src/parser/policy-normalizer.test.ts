@@ -76,9 +76,9 @@ describe('generateSourcePolicyId', () => {
       expect(id1).not.toBe(id2);
     });
 
-    it('should include full path for stability', () => {
+    it('should use stabilized path descriptor (filename) for stability', () => {
       const id = generateSourcePolicyId('/path/to/policy.json', '', 0);
-      expect(id).toBe('/path/to/policy.json:0');
+      expect(id).toBe('policy.json:0');
     });
   });
 

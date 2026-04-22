@@ -16,6 +16,7 @@ import type {
   InputStatement,
   StandardStatement,
 } from './policy-types.js';
+import { createHash } from 'node:crypto';
 
 // ============================================================================
 // Type Definitions
@@ -61,9 +62,22 @@ type NormalizedConditions = Readonly<Record<string, Readonly<Record<string, Norm
 // ============================================================================
 
 /**
+ * Stabilize a file path to a relative path descriptor.
+ * Uses the last meaningful component (filename) for stability
+ * while avoiding exposing full machine paths.
+ *
+ * @param sourcePolicyPath - Full path to the source policy file
+ * @returns Stabilized relative path descriptor (filename only)
+ */
+function stabilizePathDescriptor(sourcePolicyPath: string): string {
+  const parts = sourcePolicyPath.split('/');
+  return parts[parts.length - 1] || sourcePolicyPath;
+}
+
+/**
  * Generate a stable sourcePolicyId based on input source.
  *
- * For file input: uses the full path + sourcePolicyIndex
+ * For file input: uses stabilized path descriptor + sourcePolicyIndex
  * For non-file input: uses sourceDescription + sourcePolicyIndex
  *
  * @param sourcePolicyPath - Source file path (can be empty)
@@ -77,8 +91,8 @@ export function generateSourcePolicyId(
   sourcePolicyIndex: number,
 ): string {
   if (sourcePolicyPath && sourcePolicyPath.length > 0) {
-    // For file input: use full path + index for maximum stability and uniqueness
-    return `${sourcePolicyPath}:${sourcePolicyIndex}`;
+    // For file input: use stabilized path descriptor + index
+    return `${stabilizePathDescriptor(sourcePolicyPath)}:${sourcePolicyIndex}`;
   }
   // For non-file input: use sourceDescription + index
   return `${sourceDescription}:${sourcePolicyIndex}`;
@@ -111,8 +125,7 @@ function generateStatementContentHash(statement: InputStatement): string {
  * @returns MD5 hash (first 8 hex characters)
  */
 function md5Hash(input: string): string {
-  const crypto = require('crypto');
-  return crypto.createHash('md5').update(input).digest('hex').substring(0, 8);
+  return createHash('md5').update(input).digest('hex').substring(0, 8);
 }
 
 /**
