@@ -86,9 +86,70 @@ export function createDiagnostic(
   };
 }
 
+import type { InputInvalidResult, InputUnsupportedResult } from './policy-types.js';
+import type { EvaluationRequest } from './evaluation-request-types.js';
+
+/**
+ * Create a Diagnostic from an InputInvalidResult (D01).
+ * This is the minimum bridge from D01's invalid classification to D04's error model.
+ */
+export function fromInputInvalid(result: InputInvalidResult): Diagnostic {
+  return {
+    hasInvalid: true,
+    invalidInputs: [{
+      code: result.reason,
+      message: result.detail ?? result.reason,
+    }],
+    hasUnsupported: false,
+    unsupportedFeatures: [],
+  };
+}
+
+/**
+ * Create a Diagnostic from an InputUnsupportedResult (D01).
+ * This is the minimum bridge from D01's unsupported_feature classification to D04's error model.
+ */
+export function fromInputUnsupported(result: InputUnsupportedResult): Diagnostic {
+  return {
+    hasInvalid: false,
+    invalidInputs: [],
+    hasUnsupported: true,
+    unsupportedFeatures: [{
+      feature: result.feature,
+      detail: result.detail,
+    }],
+  };
+}
+
+/**
+ * EvaluatorInput - combines evaluation request with optional diagnostic.
+ * This is the minimum bridge from D03 (EvaluationRequest) and D04 (Diagnostic)
+ * to downstream evaluation stages.
+ */
 /**
  * Check if a Diagnostic has any issues.
  */
 export function hasIssues(diagnostic: Diagnostic): boolean {
   return diagnostic.hasInvalid || diagnostic.hasUnsupported;
+}
+
+/**
+ * EvaluatorInput - combines evaluation request with optional diagnostic.
+ * This is the minimum bridge from D03 (EvaluationRequest) and D04 (Diagnostic)
+ * to downstream evaluation stages.
+ */
+export interface EvaluatorInput {
+  readonly request: EvaluationRequest;
+  readonly diagnostic: Diagnostic;
+}
+
+/**
+ * Create an EvaluatorInput from an EvaluationRequest and Diagnostic.
+ * This is the minimum bridge from D03 to D04 and beyond.
+ */
+export function createEvaluatorInput(
+  request: EvaluationRequest,
+  diagnostic: Diagnostic
+): EvaluatorInput {
+  return { request, diagnostic };
 }

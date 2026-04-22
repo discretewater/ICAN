@@ -4,12 +4,64 @@ import {
   createInvalidInput,
   createDiagnostic,
   hasIssues,
+  fromInputInvalid,
+  fromInputUnsupported,
+  createEvaluatorInput,
+} from './error-model.js';
+import type {
   UnsupportedFeature,
   InvalidInput,
   Diagnostic,
 } from './error-model.js';
+import type { EvaluationRequest } from './evaluation-request-types.js';
 
 describe('error-model', () => {
+  describe('D01/D03 bridging', () => {
+    it('should create Diagnostic from InputInvalidResult', () => {
+      const invalidResult = {
+        ok: false as const,
+        classification: 'invalid' as const,
+        reason: 'invalid_json' as const,
+        detail: 'Unexpected token at position 0',
+      };
+      const diagnostic = fromInputInvalid(invalidResult);
+      expect(diagnostic.hasInvalid).toBe(true);
+      expect(diagnostic.invalidInputs.length).toBe(1);
+      const firstError: InvalidInput = diagnostic.invalidInputs[0] as InvalidInput;
+      expect(firstError.code).toBe('invalid_json');
+      expect(diagnostic.hasUnsupported).toBe(false);
+    });
+
+    it('should create Diagnostic from InputUnsupportedResult', () => {
+      const unsupportedResult = {
+        ok: false as const,
+        classification: 'unsupported_feature' as const,
+        reason: 'unsupported_feature' as const,
+        feature: 'NotAction',
+        detail: 'NotAction is not supported in phase 1',
+      };
+      const diagnostic = fromInputUnsupported(unsupportedResult);
+      expect(diagnostic.hasUnsupported).toBe(true);
+      expect(diagnostic.unsupportedFeatures.length).toBe(1);
+      const firstFeature: UnsupportedFeature = diagnostic.unsupportedFeatures[0] as UnsupportedFeature;
+      expect(firstFeature.feature).toBe('NotAction');
+      expect(diagnostic.hasInvalid).toBe(false);
+    });
+
+    it('should create EvaluatorInput with request and diagnostic', () => {
+      const request: EvaluationRequest = {
+        action: 's3:GetObject',
+        resource: 'arn:aws:s3:::bucket/key',
+        context: {},
+      };
+      const diagnostic = createDiagnostic([], [createUnsupportedFeature('NotAction')]);
+      const input = createEvaluatorInput(request, diagnostic);
+      expect(input.request).toBe(request);
+      expect(input.diagnostic).toBe(diagnostic);
+      expect(hasIssues(input.diagnostic)).toBe(true);
+    });
+  });
+
   describe('createUnsupportedFeature', () => {
     it('should create UnsupportedFeature with feature only', () => {
       const result = createUnsupportedFeature('NotAction');
