@@ -222,8 +222,10 @@ function handleStringLike(key: string, policyValues: readonly string[], contextV
 
 /**
  * Bool – boolean comparison with normalisation.
- * contextValue is normalised from boolean or from the strings "true" /
- * "false".  Policy values are expected to be "true" or "false" strings.
+ * Only `boolean`, the string `"true"`, and the string `"false"` are
+ * accepted as valid boolean representations.  Any other value (e.g.
+ * `"foo"`, `123`) is treated as a type mismatch and yields `false`.
+ * Policy values are expected to be "true" or "false" strings.
  */
 function handleBool(key: string, policyValues: readonly string[], contextValue: unknown): boolean {
   void key;
@@ -232,7 +234,13 @@ function handleBool(key: string, policyValues: readonly string[], contextValue: 
   if (typeof contextValue === 'boolean') {
     normalizedContext = contextValue;
   } else if (typeof contextValue === 'string') {
-    normalizedContext = contextValue === 'true';
+    if (contextValue === 'true') {
+      normalizedContext = true;
+    } else if (contextValue === 'false') {
+      normalizedContext = false;
+    } else {
+      return false;
+    }
   } else {
     return false;
   }

@@ -58,6 +58,33 @@ describe('condition-evaluator', () => {
       expect(result).toEqual({ matched: false, reason: 'conditions_not_matched' });
     });
 
+    it('should match Bool when context value is "true" string and policy expects true (T5b)', () => {
+      const conditions: readonly ConditionEntry[] = [
+        { operator: 'Bool', key: 'aws:SecureTransport', values: ['true'] },
+      ];
+      const context: EvaluationContext = { 'aws:SecureTransport': 'true' };
+      const result: ConditionEvaluationResult = evaluateConditions(conditions, context);
+      expect(result).toEqual({ matched: true, reason: 'conditions_matched' });
+    });
+
+    it('should match Bool when context value is "false" string and policy expects false (T5c)', () => {
+      const conditions: readonly ConditionEntry[] = [
+        { operator: 'Bool', key: 'aws:SecureTransport', values: ['false'] },
+      ];
+      const context: EvaluationContext = { 'aws:SecureTransport': 'false' };
+      const result: ConditionEvaluationResult = evaluateConditions(conditions, context);
+      expect(result).toEqual({ matched: true, reason: 'conditions_matched' });
+    });
+
+    it('should not match Bool when context value is an illegal boolean string like "foo" (T5d)', () => {
+      const conditions: readonly ConditionEntry[] = [
+        { operator: 'Bool', key: 'aws:SecureTransport', values: ['false'] },
+      ];
+      const context: EvaluationContext = { 'aws:SecureTransport': 'foo' };
+      const result: ConditionEvaluationResult = evaluateConditions(conditions, context);
+      expect(result).toEqual({ matched: false, reason: 'conditions_not_matched' });
+    });
+
     it('should match IpAddress when IP is inside CIDR range (T6)', () => {
       const conditions: readonly ConditionEntry[] = [
         { operator: 'IpAddress', key: 'aws:SourceIp', values: ['192.168.1.0/24'] },
