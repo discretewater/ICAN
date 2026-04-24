@@ -85,6 +85,15 @@ describe('condition-evaluator', () => {
       expect(result).toEqual({ matched: false, reason: 'conditions_not_matched' });
     });
 
+    it('should not match Bool when context value is a number (T5e)', () => {
+      const conditions: readonly ConditionEntry[] = [
+        { operator: 'Bool', key: 'aws:SecureTransport', values: ['true'] },
+      ];
+      const context: EvaluationContext = { 'aws:SecureTransport': 123 };
+      const result: ConditionEvaluationResult = evaluateConditions(conditions, context);
+      expect(result).toEqual({ matched: false, reason: 'conditions_not_matched' });
+    });
+
     it('should match IpAddress when IP is inside CIDR range (T6)', () => {
       const conditions: readonly ConditionEntry[] = [
         { operator: 'IpAddress', key: 'aws:SourceIp', values: ['192.168.1.0/24'] },
