@@ -38,8 +38,11 @@ export type FinalDecision = 'ALLOW' | 'EXPLICIT_DENY' | 'IMPLICIT_DENY';
  * Determines whether the final decision is fully determined or
  * influenced by unsupported features.
  *
- * - DETERMINATE: no unsupported features detected in any MatchResult.
- * - INDETERMINATE: at least one MatchResult carries unsupportedFeatures.
+ * - DETERMINATE: the final decision is considered stable under the
+ *   frozen decision rules, including the case where an applicable Deny
+ *   determines the result despite other unsupported features.
+ * - INDETERMINATE: unsupported features exist and no applicable Deny
+ *   independently determines the result.
  */
 export type DecisionStatus = 'DETERMINATE' | 'INDETERMINATE';
 
@@ -48,7 +51,9 @@ export type DecisionStatus = 'DETERMINATE' | 'INDETERMINATE';
  *
  * Fields:
  * - finalDecision: the merged policy decision.
- * - decisionStatus: DETERMINATE if no unsupported features, INDETERMINATE otherwise.
+ * - decisionStatus: DETERMINATE if the decision is stable under frozen rules
+ *   (including applicable-Deny-overrides-unsupported); INDETERMINATE if unsupported
+ *   features exist and no applicable Deny independently determines the result.
  * - matchedDenyStatementIds: IDs of applicable Deny statements, in input order.
  * - matchedAllowStatementIds: IDs of applicable Allow statements, in input order.
  * - statementResults: original MatchResult array, preserved as-is.
