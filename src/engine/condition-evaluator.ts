@@ -1,5 +1,7 @@
 import { compileResourcePattern } from './resource-matcher.js';
 
+// ─── Public types ─────────────────────────────────────────────────────
+
 /**
  * First-stage supported Condition operators.
  */
@@ -35,6 +37,33 @@ export interface ConditionEvaluationResult {
   readonly unsupportedDetails?: readonly string[];
 }
 
+// ─── Internal types & dispatch ───────────────────────────────────────
+
+/**
+ * Handler signature for a single Condition operator.
+ *
+ * @param key           - Condition key being evaluated.
+ * @param policyValues  - Normalised policy values for this entry.
+ * @param contextValue  - Runtime value from the evaluation context.
+ * @returns `true` if the entry matches, `false` otherwise.
+ */
+type ConditionHandler = (
+  key: string,
+  policyValues: readonly string[],
+  contextValue: unknown,
+) => boolean;
+
+/**
+ * Mapping from a supported operator name to its evaluation handler.
+ * Each handler encapsulates the matching logic for one operator kind.
+ */
+const HANDLER_MAP: Readonly<Record<ConditionOperator, ConditionHandler>> = {
+  StringEquals: handleStringEquals,
+  StringLike: handleStringLike,
+  Bool: handleBool,
+  IpAddress: handleIpAddress,
+};
+
 /** Operators supported in the first stage. */
 const SUPPORTED_OPERATORS: ReadonlySet<string> = new Set<ConditionOperator>([
   'StringEquals',
@@ -43,8 +72,15 @@ const SUPPORTED_OPERATORS: ReadonlySet<string> = new Set<ConditionOperator>([
   'IpAddress',
 ]);
 
-/** Pre-computed byte masks for CIDR matching (index = remaining bits). */
-const BYTE_MASKS: readonly number[] = [0x00, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff];
+/**
+ * Type guard: returns `true` when the operator string is one of the
+ * currently-supported Condition operators.
+ */
+function isSupportedOperator(op: string): op is ConditionOperator {
+  return SUPPORTED_OPERATORS.has(op);
+}
+
+// ─── normalizeConditions ───────────────────────────────────────────────
 
 /**
  * Flatten the nested RawConditions structure into a linear list of
@@ -89,6 +125,8 @@ export function normalizeConditions(raw: RawConditions): ConditionEntry[] {
   return entries;
 }
 
+// ─── evaluateConditions ───────────────────────────────────────────────
+
 /**
  * Evaluate a list of ConditionEntry objects against the supplied context.
  *
@@ -103,14 +141,7 @@ export function evaluateConditions(
   conditions: readonly ConditionEntry[],
   context: EvaluationContext,
 ): ConditionEvaluationResult {
-  const unsupportedDetails: string[] = [];
-
-  for (const entry of conditions) {
-    if (!SUPPORTED_OPERATORS.has(entry.operator)) {
-      unsupportedDetails.push(`unsupported operator: ${entry.operator}`);
-    }
-  }
-
+  const unsupportedDetails = scanUnsupportedOperators(conditions);
   if (unsupportedDetails.length > 0) {
     return {
       matched: false,
@@ -119,6 +150,33 @@ export function evaluateConditions(
     };
   }
 
+  return evaluateAllEntries(conditions, context);
+}
+
+/**
+ * Scan the conditions list for operators not included in the supported
+ * set.  Returns a (possibly empty) list of human-readable detail strings.
+ */
+function scanUnsupportedOperators(
+  conditions: readonly ConditionEntry[],
+): string[] {
+  const details: string[] = [];
+  for (const entry of conditions) {
+    if (!isSupportedOperator(entry.operator)) {
+      details.push(`unsupported operator: ${entry.operator}`);
+    }
+  }
+  return details;
+}
+
+/**
+ * Evaluate every supported condition entry against the context.
+ * Short-circuits on the first entry that does not match.
+ */
+function evaluateAllEntries(
+  conditions: readonly ConditionEntry[],
+  context: EvaluationContext,
+): ConditionEvaluationResult {
   for (const entry of conditions) {
     const contextValue = context[entry.key];
 
@@ -129,30 +187,9 @@ export function evaluateConditions(
       };
     }
 
-    let handlerResult: boolean;
-
-    switch (entry.operator) {
-      case 'StringEquals': {
-        handlerResult = handleStringEquals(entry.key, entry.values, contextValue);
-        break;
-      }
-      case 'StringLike': {
-        handlerResult = handleStringLike(entry.key, entry.values, contextValue);
-        break;
-      }
-      case 'Bool': {
-        handlerResult = handleBool(entry.key, entry.values, contextValue);
-        break;
-      }
-      case 'IpAddress': {
-        handlerResult = handleIpAddress(entry.key, entry.values, contextValue);
-        break;
-      }
-      default: {
-        // Unreachable because unsupported operators are filtered out above.
-        throw new Error(`Unexpected operator: ${entry.operator}`);
-      }
-    }
+    // Safe cast: unsupported operators are filtered out before this point.
+    const handler = HANDLER_MAP[entry.operator as ConditionOperator];
+    const handlerResult = handler(entry.key, entry.values, contextValue);
 
     if (!handlerResult) {
       return {
@@ -167,6 +204,8 @@ export function evaluateConditions(
     reason: 'conditions_matched',
   };
 }
+
+// ─── Operator handlers ────────────────────────────────────────────────
 
 /**
  * StringEquals – case-sensitive strict equality.
@@ -248,6 +287,11 @@ function handleBool(key: string, policyValues: readonly string[], contextValue: 
   const normalizedPolicies = policyValues.map((v) => v === 'true');
   return normalizedPolicies.some((p) => p === normalizedContext);
 }
+
+// ─── IpAddress helper functions ───────────────────────────────────────
+
+/** Pre-computed byte masks for CIDR matching (index = remaining bits). */
+const BYTE_MASKS: readonly number[] = [0x00, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff];
 
 /**
  * Parse an IPv4 address into its four byte components.
