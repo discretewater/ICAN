@@ -30,12 +30,45 @@ export interface EvaluationContext {
 
 /**
  * Result of evaluating a set of Condition entries.
+ *
+ * Error model – three reason types with strict priority:
+ *
+ *   1. `unsupported_feature` – at least one ConditionEntry uses an operator
+ *      not in the current supported set.  This reason takes **priority** over
+ *      all other evaluations.  When returned, `unsupportedDetails` contains
+ *      one entry per unsupported operator, in ConditionEntry appearance order,
+ *      with format `"unsupported operator: {operator}"`.
+ *
+ *   2. `conditions_not_matched` – all operators are supported, but at least
+ *      one condition entry did not match (missing key, null/undefined value,
+ *      type mismatch, or handler returned false).  `unsupportedDetails` is
+ *      absent (`undefined`).
+ *
+ *   3. `conditions_matched` – all condition entries evaluated to true.
+ *      `unsupportedDetails` is absent (`undefined`).
  */
 export interface ConditionEvaluationResult {
   readonly matched: boolean;
   readonly reason: 'conditions_matched' | 'conditions_not_matched' | 'unsupported_feature';
   readonly unsupportedDetails?: readonly string[];
 }
+
+// ─── Reason constants ────────────────────────────────────────────────
+
+/**
+ * Internal reason constants that freeze the three Condition error-model
+ * outcomes.  Using these instead of raw string literals makes the
+ * error-model boundaries explicit and avoids silent typos.
+ */
+
+/** All supported condition entries evaluated to true. */
+const REASON_CONDITIONS_MATCHED = 'conditions_matched' as const;
+
+/** At least one supported condition entry did not match. */
+const REASON_CONDITIONS_NOT_MATCHED = 'conditions_not_matched' as const;
+
+/** At least one unsupported operator was found; takes priority over other reasons. */
+const REASON_UNSUPPORTED_FEATURE = 'unsupported_feature' as const;
 
 // ─── Internal types & dispatch ───────────────────────────────────────
 
@@ -145,7 +178,7 @@ export function evaluateConditions(
   if (unsupportedDetails.length > 0) {
     return {
       matched: false,
-      reason: 'unsupported_feature',
+      reason: REASON_UNSUPPORTED_FEATURE,
       unsupportedDetails,
     };
   }
@@ -183,7 +216,7 @@ function evaluateAllEntries(
     if (contextValue === undefined || contextValue === null) {
       return {
         matched: false,
-        reason: 'conditions_not_matched',
+        reason: REASON_CONDITIONS_NOT_MATCHED,
       };
     }
 
@@ -194,14 +227,14 @@ function evaluateAllEntries(
     if (!handlerResult) {
       return {
         matched: false,
-        reason: 'conditions_not_matched',
+        reason: REASON_CONDITIONS_NOT_MATCHED,
       };
     }
   }
 
   return {
     matched: true,
-    reason: 'conditions_matched',
+    reason: REASON_CONDITIONS_MATCHED,
   };
 }
 
