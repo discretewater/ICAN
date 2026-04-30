@@ -190,6 +190,30 @@ describe('OutputGoldenCaseOutline - extended fields', () => {
     }
   });
 
+  it('should support optional expectedJson field', () => {
+    const outline: OutputGoldenCaseOutline = {
+      id: 'ogc-test-003b',
+      baseCaseId: 'gc-allow-single',
+      kind: 'json-output',
+      purpose: 'Verify JSON output for ALLOW.',
+      assertionFields: ['finalDecision', 'matchedAllowStatementIds'],
+      expectedJson: {
+        finalDecision: 'ALLOW',
+        decisionStatus: 'DETERMINATE',
+        matchedAllowStatementIds: ['stmt-allow-1'],
+        matchedDenyStatementIds: [],
+      },
+    };
+    expect(outline.expectedJson).toBeDefined();
+    const json = outline.expectedJson;
+    expect(json).toBeDefined();
+    if (json) {
+      expect(json.finalDecision).toBe('ALLOW');
+      expect(json.matchedAllowStatementIds).toEqual(['stmt-allow-1']);
+      expect(json.matchedDenyStatementIds).toEqual([]);
+    }
+  });
+
   it('should support optional expectedDiagnostics field', () => {
     const outline: OutputGoldenCaseOutline = {
       id: 'ogc-test-005',
