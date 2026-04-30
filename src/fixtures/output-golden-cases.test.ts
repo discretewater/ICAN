@@ -123,30 +123,50 @@ describe('OutputGoldenCaseOutline', () => {
       expect(pt[0]!.nonApplicableReasons).toContain('Resource not matched');
     }
   });
-
-  it('should support optional expectedJson field', () => {
-    const outline: OutputGoldenCaseOutline = {
-      id: 'ogc-test-003',
-      baseCaseId: 'gc-allow-single',
-      kind: 'json-output',
-      purpose: 'Verify JSON output for ALLOW.',
-      assertionFields: ['finalDecision', 'matchedAllowStatementIds'],
-      expectedJson: {
-        finalDecision: 'ALLOW',
-        decisionStatus: 'DETERMINATE',
-        matchedAllowStatementIds: ['stmt-allow-1'],
-        matchedDenyStatementIds: [],
-      },
-    };
-
-    expect(outline.expectedJson).toBeDefined();
-    const json = outline.expectedJson;
-    expect(json).toBeDefined();
-    if (json) {
-      expect(json.finalDecision).toBe('ALLOW');
-      expect(json.matchedAllowStatementIds).toEqual(['stmt-allow-1']);
-    }
+  it('should have at least one path-trace case expressing sourcePolicyPath', () => {
+    const ptCase = MINIMAL_OUTPUT_GOLDEN_CASES.find(c =>
+      c.kind === 'path-trace' &&
+      c.expectedPathTrace &&
+      c.expectedPathTrace.some(e => e.source && e.source.sourcePolicyPath !== undefined),
+    );
+    expect(ptCase).toBeDefined();
   });
+  it('should have at least one path-trace case expressing sourcePolicyIndex', () => {
+    const ptCase = MINIMAL_OUTPUT_GOLDEN_CASES.find(c =>
+      c.kind === 'path-trace' &&
+      c.expectedPathTrace &&
+      c.expectedPathTrace.some(e => e.source && e.source.sourcePolicyIndex !== undefined),
+    );
+    expect(ptCase).toBeDefined();
+  });
+  it('should have at least one case expressing all 5 StatementSource fields', () => {
+    const ptCase = MINIMAL_OUTPUT_GOLDEN_CASES.find(c =>
+      c.kind === 'path-trace' &&
+      c.expectedPathTrace &&
+      c.expectedPathTrace.some(e =>
+        e.source &&
+        e.source.sourcePolicyId !== undefined &&
+        e.source.sourcePolicyPath !== undefined &&
+        e.source.sourcePolicyIndex !== undefined &&
+        e.source.sourceStatementIndex !== undefined &&
+        e.source.sid !== undefined,
+      ),
+    );
+    expect(ptCase).toBeDefined();
+  });
+  it('source 5-field expression should align with Z02-D06 StatementSource frozen spec', () => {
+    const ptCase = MINIMAL_OUTPUT_GOLDEN_CASES.find(c => c.id === 'ogc-pt-allow');
+    expect(ptCase).toBeDefined();
+    const entry = ptCase!.expectedPathTrace![0]!;
+    expect(entry.source.sourcePolicyId).toBe('policy-0');
+    expect(entry.source.sourcePolicyPath).toBe('policies/policy-0.json');
+    expect(entry.source.sourcePolicyIndex).toBe(0);
+    expect(entry.source.sourceStatementIndex).toBe(0);
+    expect(entry.source.sid).toBe('AllowStatement');
+  });
+});
+
+describe('OutputGoldenCaseOutline - extended fields', () => {
 
   it('should support optional expectedText field', () => {
     const outline: OutputGoldenCaseOutline = {

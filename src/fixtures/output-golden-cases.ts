@@ -183,12 +183,14 @@ export const MINIMAL_OUTPUT_GOLDEN_CASES: readonly OutputGoldenCaseOutline[] = [
         unsupportedFeatures: [],
         source: {
           sourcePolicyId: 'policy-0',
+          sourcePolicyPath: 'policies/policy-0.json',
+          sourcePolicyIndex: 0,
           sourceStatementIndex: 0,
           sid: 'AllowStatement',
         },
       },
     ],
-    notes: 'Simplest positive pathTrace: one entry, applicable, no unsupported features.',
+    notes: 'Simplest positive pathTrace: one entry, applicable, covers all 5 StatementSource fields.',
   },
 
   // ── ogc-pt-deny ──
