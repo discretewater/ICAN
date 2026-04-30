@@ -319,6 +319,32 @@ describe('MINIMAL_GOLDEN_CASES', () => {
     expect(hasUnsupportedCondition).toBe(true);
   });
 
+  it('unsupported golden case gc-unsupported-condition should have decisionStatus INDETERMINATE', () => {
+    const c = MINIMAL_GOLDEN_CASES.find(x => x.id === 'gc-unsupported-condition');
+    expect(c).toBeDefined();
+    expect(c!.expectedEvaluation.decisionStatus).toBe('INDETERMINATE');
+  });
+
+  it('unsupported golden case gc-unsupported-condition should have unsupported diagnostics', () => {
+    const c = MINIMAL_GOLDEN_CASES.find(x => x.id === 'gc-unsupported-condition');
+    expect(c).toBeDefined();
+    expect(c!.expectedDiagnostics?.unsupportedFeatures).toBeDefined();
+    expect(c!.expectedDiagnostics!.unsupportedFeatures!.length).toBeGreaterThan(0);
+  });
+
+  it('unsupported golden case should have empty matched statement ids', () => {
+    const c = MINIMAL_GOLDEN_CASES.find(x => x.id === 'gc-unsupported-condition');
+    expect(c).toBeDefined();
+    expect(c!.expectedEvaluation.matchedDenyStatementIds).toEqual([]);
+    expect(c!.expectedEvaluation.matchedAllowStatementIds).toEqual([]);
+  });
+
+  it('unsupported golden case should have finalDecision IMPLICIT_DENY', () => {
+    const c = MINIMAL_GOLDEN_CASES.find(x => x.id === 'gc-unsupported-condition');
+    expect(c).toBeDefined();
+    expect(c!.expectedEvaluation.finalDecision).toBe('IMPLICIT_DENY');
+  });
+
   it('should cover Design §11.4 first batch case direction: invalid policy', () => {
     const hasInvalidPolicy = MINIMAL_GOLDEN_CASES.some(
       c => c.category === 'invalid',
