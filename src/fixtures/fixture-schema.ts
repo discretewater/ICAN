@@ -159,6 +159,8 @@ export interface ExpectedEvaluation {
 export interface ExpectedPathTraceSource {
   /** Source policy document identifier (required) */
   readonly sourcePolicyId: string;
+  /** Source policy file path (optional for partial assertions) */
+  readonly sourcePolicyPath?: string;
   /** Source policy index (optional for partial assertions) */
   readonly sourcePolicyIndex?: number;
   /** Source statement index (optional for partial assertions) */
@@ -368,6 +370,7 @@ export const EXPECTED_TEXT_OUTPUT_FILE = 'expected-text-output.txt' as const;
  */
 export const STRONG_ASSERTION_FIELDS: readonly string[] = [
   'finalDecision',
+  'decisionStatus',
   'matchedDenyStatementIds',
   'matchedAllowStatementIds',
   'pathTrace',
@@ -378,6 +381,8 @@ export const STRONG_ASSERTION_FIELDS: readonly string[] = [
   'sourcePolicyId',
   'sourceStatementIndex',
   'sid',
+  'diagnostics.invalidInputs',
+  'diagnostics.unsupportedFeatures',
 ] as const;
 
 /**

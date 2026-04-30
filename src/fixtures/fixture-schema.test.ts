@@ -46,6 +46,7 @@ import type {
   CaseInput,
   ExpectedEvaluation,
   ExpectedPathTraceEntry,
+  ExpectedPathTraceSource,
   ExpectedJsonOutput,
   ExpectedTextOutput,
   ExpectedDiagnostics,
@@ -484,6 +485,48 @@ describe('ExpectedPathTraceEntry', () => {
     expect(Array.isArray(entry.nonApplicableReasons)).toBe(true);
     expect(entry.nonApplicableReasons.every((r: string) => typeof r === 'string')).toBe(true);
   });
+
+  // ── Correction 3: ExpectedPathTraceSource can express sourcePolicyPath (optional) ──
+  it('ExpectedPathTraceSource can express sourcePolicyPath as an optional field', () => {
+    const source: ExpectedPathTraceSource = {
+      sourcePolicyId: 'policy:test-policy.json:0',
+      sourcePolicyPath: '/path/to/policy.json',
+    };
+
+    expect(source.sourcePolicyPath).toBe('/path/to/policy.json');
+  });
+
+  it('sourcePolicyPath is optional (omitted without error)', () => {
+    const source: ExpectedPathTraceSource = {
+      sourcePolicyId: 'policy:test-policy.json:0',
+    };
+
+    expect(source.sourcePolicyId).toBe('policy:test-policy.json:0');
+    expect(source.sourcePolicyPath).toBeUndefined();
+  });
+
+  // ── Correction 4: ExpectedPathTraceEntry.source can express all 5 StatementSource fields ──
+  it('source can express all 5 StatementSource fields simultaneously', () => {
+    const entry: ExpectedPathTraceEntry = {
+      statementId: 'stmt:policy-0:abc123',
+      applicable: true,
+      nonApplicableReasons: [],
+      unsupportedFeatures: [],
+      source: {
+        sourcePolicyId: 'policy:test-policy.json:0',
+        sourcePolicyPath: '/path/to/test-policy.json',
+        sourcePolicyIndex: 0,
+        sourceStatementIndex: 2,
+        sid: 'AllowRead',
+      },
+    };
+
+    expect(entry.source.sourcePolicyId).toBe('policy:test-policy.json:0');
+    expect(entry.source.sourcePolicyPath).toBe('/path/to/test-policy.json');
+    expect(entry.source.sourcePolicyIndex).toBe(0);
+    expect(entry.source.sourceStatementIndex).toBe(2);
+    expect(entry.source.sid).toBe('AllowRead');
+  });
 });
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -758,6 +801,20 @@ describe('assertion field constants', () => {
       (f: string): boolean => WEAK_ASSERTION_FIELDS.includes(f),
     );
     expect(overlap).toEqual([]);
+  });
+
+  // ── Correction 1: decisionStatus must be a strong assertion field ──
+  it('STRONG_ASSERTION_FIELDS includes decisionStatus', () => {
+    expect(STRONG_ASSERTION_FIELDS).toContain('decisionStatus');
+  });
+
+  // ── Correction 2: diagnostics key fields must be strong assertion fields ──
+  it('STRONG_ASSERTION_FIELDS includes diagnostics.invalidInputs', () => {
+    expect(STRONG_ASSERTION_FIELDS).toContain('diagnostics.invalidInputs');
+  });
+
+  it('STRONG_ASSERTION_FIELDS includes diagnostics.unsupportedFeatures', () => {
+    expect(STRONG_ASSERTION_FIELDS).toContain('diagnostics.unsupportedFeatures');
   });
 });
 
