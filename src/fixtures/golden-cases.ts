@@ -345,7 +345,7 @@ export const MINIMAL_GOLDEN_CASES: readonly GoldenCaseOutline[] = [
     coveredFeatures: ['unsupported-condition'],
     expectedEvaluation: {
       finalDecision: 'IMPLICIT_DENY',
-      decisionStatus: 'DETERMINATE',
+      decisionStatus: 'INDETERMINATE',
       matchedDenyStatementIds: [],
       matchedAllowStatementIds: [],
     },
