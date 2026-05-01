@@ -27,6 +27,8 @@ import type {
   ExpectedEvaluation,
   ExpectedPathTraceEntry,
   ExpectedDiagnostics,
+  ExpectedJsonOutput,
+  ExpectedTextOutput,
 } from './fixture-schema.js';
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -144,6 +146,10 @@ export interface BoundaryGoldenCaseOutline {
   readonly expectedPathTrace?: readonly ExpectedPathTraceEntry[];
   /** Expected diagnostic information (optional) */
   readonly expectedDiagnostics?: ExpectedDiagnostics;
+  /** Expected JSON output assertions (optional) */
+  readonly expectedJson?: ExpectedJsonOutput;
+  /** Expected text/report output assertions (optional) */
+  readonly expectedText?: ExpectedTextOutput;
   /** Free-form planning notes (optional) */
   readonly notes?: string;
 }
@@ -387,7 +393,14 @@ export const MINIMAL_BOUNDARY_GOLDEN_CASES: readonly BoundaryGoldenCaseOutline[]
       'diagnostics.unsupportedFeatures',
     ],
     relatedBaseCaseId: 'ogc-json-indeterminate',
-    notes: 'Boundary case for JSON output: verifies that decisionStatus = INDETERMINATE coexists with finalDecision = IMPLICIT_DENY in the JSON output, and that unsupportedFeatures diagnostics are present without corrupting core evaluation fields.',
+    expectedJson: {
+      decisionStatus: 'INDETERMINATE',
+      finalDecision: 'IMPLICIT_DENY',
+      diagnostics: {
+        unsupportedFeatures: [{ feature: 'ConditionOperator:ArnEquals' }],
+      },
+    },
+    notes: 'Boundary case for JSON output: directly expresses expectedJson with INDETERMINATE decisionStatus and unsupported diagnostics.',
   },
 
   // ═════════════════════════════════════════════════════════════════════
@@ -402,7 +415,11 @@ export const MINIMAL_BOUNDARY_GOLDEN_CASES: readonly BoundaryGoldenCaseOutline[]
       'diagnostics.unsupportedFeatures',
     ],
     relatedBaseCaseId: 'ogc-text-diagnostics',
-    notes: 'Boundary case for text output: verifies that the text output includes INDETERMINATE status markers and human-readable diagnostics section content. The text must clearly distinguish "unsupported" from "denied" or "allowed".',
+    expectedText: {
+      contains: ['INDETERMINATE', 'unsupported', 'diagnostics', 'source: unavailable'],
+      notContains: [],
+    },
+    notes: 'Boundary case for text output: directly expresses expectedText with INDETERMINATE status markers and diagnostics content.',
   },
 
   // ═════════════════════════════════════════════════════════════════════

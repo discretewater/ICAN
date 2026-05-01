@@ -565,6 +565,59 @@ describe('MINIMAL_BOUNDARY_GOLDEN_CASES', () => {
   });
 });
 
+// ── expectedJson / expectedText optional field tests ──────────────────
+describe('BoundaryGoldenCaseOutline expectedJson', () => {
+  it('should support optional expectedJson field', () => {
+    const outline: BoundaryGoldenCaseOutline = {
+      id: 'bgc-test-json',
+      category: 'json-boundary',
+      purpose: 'Verify expectedJson construction.',
+      assertionFields: ['decisionStatus'],
+      expectedJson: {
+        decisionStatus: 'INDETERMINATE',
+        finalDecision: 'IMPLICIT_DENY',
+        diagnostics: {
+          unsupportedFeatures: [{ feature: 'ConditionOperator:ArnEquals' }],
+        },
+      },
+    };
+    expect(outline.expectedJson).toBeDefined();
+    expect(outline.expectedJson!.decisionStatus).toBe('INDETERMINATE');
+    expect(outline.expectedJson!.diagnostics).toBeDefined();
+  });
+
+  it('bgc-json-boundary should have expectedJson with INDETERMINATE', () => {
+    const c = MINIMAL_BOUNDARY_GOLDEN_CASES.find(x => x.id === 'bgc-json-boundary');
+    expect(c).toBeDefined();
+    expect(c!.expectedJson).toBeDefined();
+    expect(c!.expectedJson!.decisionStatus).toBe('INDETERMINATE');
+  });
+});
+
+describe('BoundaryGoldenCaseOutline expectedText', () => {
+  it('should support optional expectedText field', () => {
+    const outline: BoundaryGoldenCaseOutline = {
+      id: 'bgc-test-text',
+      category: 'text-boundary',
+      purpose: 'Verify expectedText construction.',
+      assertionFields: ['textOutput'],
+      expectedText: {
+        contains: ['INDETERMINATE', 'unsupported'],
+        notContains: [],
+      },
+    };
+    expect(outline.expectedText).toBeDefined();
+    expect(outline.expectedText!.contains).toContain('INDETERMINATE');
+  });
+
+  it('bgc-text-boundary should have expectedText with contains', () => {
+    const c = MINIMAL_BOUNDARY_GOLDEN_CASES.find(x => x.id === 'bgc-text-boundary');
+    expect(c).toBeDefined();
+    expect(c!.expectedText).toBeDefined();
+    expect(c!.expectedText!.contains.length).toBeGreaterThan(0);
+  });
+});
+
 // ═══════════════════════════════════════════════════════════════════════
 // D04 boundary constraints
 // ═══════════════════════════════════════════════════════════════════════
