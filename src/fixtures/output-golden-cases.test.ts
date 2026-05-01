@@ -209,6 +209,7 @@ describe('OutputGoldenCaseOutline - extended fields', () => {
     expect(json).toBeDefined();
     if (json) {
       expect(json.finalDecision).toBe('ALLOW');
+      expect(json.decisionStatus).toBe('DETERMINATE');
       expect(json.matchedAllowStatementIds).toEqual(['stmt-allow-1']);
       expect(json.matchedDenyStatementIds).toEqual([]);
     }
