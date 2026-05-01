@@ -104,7 +104,7 @@ export const Z05_ACHIEVEMENTS: readonly Z05Achievement[] = [
       'No CLI, stdout/stderr, or file I/O',
       'No `any` type usage',
     ],
-    testCaseCount: 960, // fixture-schema.test.ts test count at D01 closeout
+    testCaseCount: 75, // fixture-schema.test.ts static test count at D01 closeout
     closed: true,
   },
   {
@@ -126,7 +126,7 @@ export const Z05_ACHIEVEMENTS: readonly Z05Achievement[] = [
       'No CLI, stdout/stderr, or file I/O',
       'No `any` type usage',
     ],
-    testCaseCount: 400, // golden-cases.test.ts test count at D02 closeout
+    testCaseCount: 30, // golden-cases.test.ts static test count at D02 closeout
     closed: true,
   },
   {
@@ -152,7 +152,7 @@ export const Z05_ACHIEVEMENTS: readonly Z05Achievement[] = [
       'No CLI, stdout/stderr, or file I/O',
       'No `any` type usage',
     ],
-    testCaseCount: 500, // output-golden-cases.test.ts test count at D03 closeout
+    testCaseCount: 45, // output-golden-cases.test.ts static test count at D03 closeout
     closed: true,
   },
   {
@@ -176,7 +176,7 @@ export const Z05_ACHIEVEMENTS: readonly Z05Achievement[] = [
       'No CLI, stdout/stderr, or file I/O',
       'No `any` type usage',
     ],
-    testCaseCount: 550, // boundary-golden-cases.test.ts test count at D04 closeout
+    testCaseCount: 61, // boundary-golden-cases.test.ts static test count at D04 closeout
     closed: true,
   },
 ] as const;
@@ -1223,7 +1223,7 @@ export const Z05_FINAL_TALLY: readonly Z05Tally[] = [
     unionVariants: 0,
     constants: 13,
     outlines: 0,
-    testCases: 442,
+    testCases: 75,
     notes: [
       '9 types: CaseMetadata, OriginType, CaseInput, ExpectedEvaluation, ExpectedPathTraceEntry, ExpectedPathTraceSource, ExpectedJsonOutput, ExpectedTextOutput, ExpectedDiagnostics, AssertionKind',
       '3 union string types: OriginType (3), AssertionKind (3)',
@@ -1237,7 +1237,7 @@ export const Z05_FINAL_TALLY: readonly Z05Tally[] = [
     unionVariants: 6,
     constants: 2,
     outlines: 13,
-    testCases: 452,
+    testCases: 30,
     notes: [
       '2 types: GoldenCaseCategory (6 variants), GoldenCaseOutline',
       'VALID_GOLDEN_CASE_CATEGORIES + MINIMAL_GOLDEN_CASES constants',
@@ -1250,7 +1250,7 @@ export const Z05_FINAL_TALLY: readonly Z05Tally[] = [
     unionVariants: 6,
     constants: 2,
     outlines: 13,
-    testCases: 541,
+    testCases: 45,
     notes: [
       '2 types: OutputGoldenCaseKind (6 variants), OutputGoldenCaseOutline',
       'VALID_OUTPUT_GOLDEN_CASE_KINDS + MINIMAL_OUTPUT_GOLDEN_CASES constants',
@@ -1264,7 +1264,7 @@ export const Z05_FINAL_TALLY: readonly Z05Tally[] = [
     unionVariants: 10,
     constants: 2,
     outlines: 11,
-    testCases: 535,
+    testCases: 61,
     notes: [
       '2 types: BoundaryGoldenCaseCategory (10 variants), BoundaryGoldenCaseOutline',
       'VALID_BOUNDARY_GOLDEN_CASE_CATEGORIES + MINIMAL_BOUNDARY_GOLDEN_CASES constants',
@@ -1275,12 +1275,12 @@ export const Z05_FINAL_TALLY: readonly Z05Tally[] = [
     unitId: 'Z05-D05',
     types: 5,
     unionVariants: 1,
-    constants: 10,
-    outlines: 0,
-    testCases: 0,
-    notes: [
-      '5 types: Z05Achievement, AcceptanceCoverageEntry, CoverageDimension (4 variants), Z05CloseoutCondition, Z05Tally',
-      '10 constants: Z05_ACHIEVEMENTS, COVERAGE_MATRIX, STRONG_ASSERTION_COVERAGE, WEAK_ASSERTION_COVERAGE, INVALID_COVERAGE, UNSUPPORTED_COVERAGE, INDETERMINATE_COVERAGE, SOURCE_COVERAGE, EMPTY_COLLECTIONS_COVERAGE, Z05_CLOSEOUT_CONDITIONS, Z05_FINAL_TALLY',
+   constants: 13,
+   outlines: 0,
+   testCases: 93,
+   notes: [
+     '5 types: Z05Achievement, AcceptanceCoverageEntry, CoverageDimension (4 variants), Z05CloseoutCondition, Z05Tally',
+     '13 constants: Z05_ACHIEVEMENTS, COVERAGE_MATRIX, VALID_COVERAGE_DIMENSIONS, STRONG_ASSERTION_COVERAGE, WEAK_ASSERTION_COVERAGE, INVALID_COVERAGE, UNSUPPORTED_COVERAGE, INDETERMINATE_COVERAGE, SOURCE_COVERAGE, EMPTY_COLLECTIONS_COVERAGE, Z05_CLOSEOUT_CONDITIONS, Z05_FINAL_TALLY, Z05_TO_S01_TRANSITION',
       'Coverage matrix: 60 entries across 4 dimensions',
     ],
   },

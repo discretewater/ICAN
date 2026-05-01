@@ -682,11 +682,10 @@ describe('Z05_FINAL_TALLY', () => {
     }
   });
 
-  it('should have testCases count of 0 for D05 (no test at tally time)', () => {
-    const d05 = Z05_FINAL_TALLY.find((t) => t.unitId === 'Z05-D05');
-    expect(d05).toBeDefined();
-    // D05 test count will be updated after this test file is counted
-    expect(d05!.testCases).toBe(0);
+ it('should have testCases count of 93 for D05', () => {
+   const d05 = Z05_FINAL_TALLY.find((t) => t.unitId === 'Z05-D05');
+   expect(d05).toBeDefined();
+   expect(d05!.testCases).toBe(93);
   });
 
   it('should have positive test case counts for D01-D04', () => {
