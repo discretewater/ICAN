@@ -400,6 +400,170 @@ describe('parseCheckArgs - missing flag value', () => {
   });
 });
 
+// ─── Tests: parseCheckArgs - duplicate single-value flags ────────────
+
+describe('parseCheckArgs - duplicate flags', () => {
+  it('TD1: duplicate --action should return duplicate_flag error', () => {
+    const result = parseCheckArgs([
+      '--policy', 'p1.json',
+      '--action', 's3:GetObject',
+      '--action', 's3:PutObject',
+      '--resource', 'arn:aws:s3:::bucket/*',
+    ]);
+    expect(result.kind).toBe('error');
+    if (result.kind === 'error') {
+      expect(result.errors.some((e) => e.code === 'duplicate_flag')).toBe(true);
+      expect(result.errors.some((e) => e.message.includes('--action'))).toBe(true);
+    }
+  });
+
+  it('TD2: duplicate --resource should return duplicate_flag error', () => {
+    const result = parseCheckArgs([
+      '--policy', 'p1.json',
+      '--action', 's3:GetObject',
+      '--resource', 'arn:aws:s3:::bucket1/*',
+      '--resource', 'arn:aws:s3:::bucket2/*',
+    ]);
+    expect(result.kind).toBe('error');
+    if (result.kind === 'error') {
+      expect(result.errors.some((e) => e.code === 'duplicate_flag')).toBe(true);
+      expect(result.errors.some((e) => e.message.includes('--resource'))).toBe(true);
+    }
+  });
+
+  it('TD3: duplicate --format should return duplicate_flag error', () => {
+    const result = parseCheckArgs([
+      '--policy', 'p1.json',
+      '--action', 's3:GetObject',
+      '--resource', 'arn:aws:s3:::bucket/*',
+      '--format', 'text',
+      '--format', 'json',
+    ]);
+    expect(result.kind).toBe('error');
+    if (result.kind === 'error') {
+      expect(result.errors.some((e) => e.code === 'duplicate_flag')).toBe(true);
+      expect(result.errors.some((e) => e.message.includes('--format'))).toBe(true);
+    }
+  });
+
+  it('TD4: duplicate --context-json should return duplicate_flag error', () => {
+    const result = parseCheckArgs([
+      '--policy', 'p1.json',
+      '--action', 's3:GetObject',
+      '--resource', 'arn:aws:s3:::bucket/*',
+      '--context-json', '{"a":1}',
+      '--context-json', '{"b":2}',
+    ]);
+    expect(result.kind).toBe('error');
+    if (result.kind === 'error') {
+      expect(result.errors.some((e) => e.code === 'duplicate_flag')).toBe(true);
+      expect(result.errors.some((e) => e.message.includes('--context-json'))).toBe(true);
+    }
+  });
+
+  it('TD5: duplicate --context-file should return duplicate_flag error', () => {
+    const result = parseCheckArgs([
+      '--policy', 'p1.json',
+      '--action', 's3:GetObject',
+      '--resource', 'arn:aws:s3:::bucket/*',
+      '--context-file', './a.json',
+      '--context-file', './b.json',
+    ]);
+    expect(result.kind).toBe('error');
+    if (result.kind === 'error') {
+      expect(result.errors.some((e) => e.code === 'duplicate_flag')).toBe(true);
+      expect(result.errors.some((e) => e.message.includes('--context-file'))).toBe(true);
+    }
+  });
+
+  it('TD6: multiple duplicate flags should list all duplicate errors', () => {
+    const result = parseCheckArgs([
+      '--policy', 'p1.json',
+      '--action', 's3:GetObject',
+      '--action', 's3:PutObject',
+      '--resource', 'arn:aws:s3:::bucket1/*',
+      '--resource', 'arn:aws:s3:::bucket2/*',
+    ]);
+    expect(result.kind).toBe('error');
+    if (result.kind === 'error') {
+      const dupErrors = result.errors.filter((e) => e.code === 'duplicate_flag');
+      expect(dupErrors.length).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it('TD7: --policy should still allow multiple values (not a duplicate error)', () => {
+    const result = parseCheckArgs([
+      '--policy', 'p1.json',
+      '--policy', 'p2.json',
+      '--action', 's3:GetObject',
+      '--resource', 'arn:aws:s3:::bucket/*',
+    ]);
+    expect(result.kind).toBe('success');
+  });
+});
+
+// ─── Tests: parseCheckArgs - unexpected positional arguments ─────────
+
+describe('parseCheckArgs - positional arguments', () => {
+  it('TP1: single positional argument should return unexpected_positional error', () => {
+    const result = parseCheckArgs([
+      '--policy', 'p1.json',
+      '--action', 's3:GetObject',
+      '--resource', 'arn:aws:s3:::bucket/*',
+      'extra-arg',
+    ]);
+    expect(result.kind).toBe('error');
+    if (result.kind === 'error') {
+      expect(result.errors.some((e) => e.code === 'unexpected_positional')).toBe(true);
+      expect(result.errors.some((e) => e.message.includes('extra-arg'))).toBe(true);
+    }
+  });
+
+  it('TP2: positional arguments before flags should be caught', () => {
+    const result = parseCheckArgs([
+      'positional-arg',
+      '--policy', 'p1.json',
+      '--action', 's3:GetObject',
+      '--resource', 'arn:aws:s3:::bucket/*',
+    ]);
+    expect(result.kind).toBe('error');
+    if (result.kind === 'error') {
+      expect(result.errors.some((e) => e.code === 'unexpected_positional')).toBe(true);
+      expect(result.errors.some((e) => e.message.includes('positional-arg'))).toBe(true);
+    }
+  });
+
+  it('TP3: multiple positional arguments should list multiple errors', () => {
+    const result = parseCheckArgs([
+      '--policy', 'p1.json',
+      '--action', 's3:GetObject',
+      '--resource', 'arn:aws:s3:::bucket/*',
+      'arg1',
+      'arg2',
+    ]);
+    expect(result.kind).toBe('error');
+    if (result.kind === 'error') {
+      const posErrors = result.errors.filter((e) => e.code === 'unexpected_positional');
+      expect(posErrors.length).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it('TP4: positional argument should not prevent detection of other errors', () => {
+    const result = parseCheckArgs([
+      '--policy', 'p1.json',
+      '--action', 's3:GetObject',
+      '--resource', 'arn:aws:s3:::bucket/*',
+      'extra-arg',
+      '--format', 'xml',
+    ]);
+    expect(result.kind).toBe('error');
+    if (result.kind === 'error') {
+      expect(result.errors.some((e) => e.code === 'unexpected_positional')).toBe(true);
+      expect(result.errors.some((e) => e.code === 'invalid_format')).toBe(true);
+    }
+  });
+});
+
 // ─── Tests: help text ─────────────────────────────────────────────────
 
 describe('help text', () => {

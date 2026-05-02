@@ -25,7 +25,6 @@
  */
 
 import { parseCheckArgs } from './parser.js';
-import { renderParamErrors } from './help.js';
 
 import type {
   CheckCommandOptions,
@@ -116,45 +115,4 @@ export function dispatch(rawArgs: readonly string[]): DispatchResult {
     kind: 'error',
     message: `Unknown command: ${subcommand}. Available commands: check. Use --help for usage information.`,
   };
-}
-
-/**
- * Main CLI entry point for the `ican` binary.
- *
- * Takes process.argv (or equivalent) and produces a string output
- * with the appropriate exit code hint. This function is a thin
- * wrapper around `dispatch` that converts the result to a
- * human-readable string.
- *
- * Note: This function does NOT call process.exit. Exit code mapping
- * is handled by D04.
- *
- * @param argv Full argv array (including node/binary path at [0],[1]).
- * @returns An object containing the output text and a suggested exit code.
- */
-export function main(argv: readonly string[]): { readonly output: string; readonly exitCode: number } {
-  const rawArgs = argv.slice(2);
-  const result = dispatch(rawArgs);
-
-  switch (result.kind) {
-    case 'help':
-      return { output: result.helpText, exitCode: 0 };
-    case 'error':
-      return { output: `Error: ${result.message}\n`, exitCode: 2 };
-    case 'parse_result':
-      if (result.parseResult.kind === 'help') {
-        return { output: result.parseResult.helpText, exitCode: 0 };
-      }
-      if (result.parseResult.kind === 'error') {
-        const errorText = renderParamErrors(result.parseResult.errors);
-        return { output: errorText, exitCode: 2 };
-      }
-      // Success: D02 will consume result.parseResult.options
-      // For now, return a placeholder message (real output in D03).
-      const opts = result.parseResult.options;
-      return {
-        output: `OK: parsed check command with action=${opts.action}, resource=${opts.resource}, policies=${opts.policies.length}\n`,
-        exitCode: 0,
-      };
-  }
 }

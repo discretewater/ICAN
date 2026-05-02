@@ -76,13 +76,17 @@ export const BOOLEAN_FLAGS: ReadonlySet<string> = new Set([
  * - mutually_exclusive: two incompatible flags were used together.
  * - unknown_flag: an unrecognized flag was provided.
  * - missing_value: a valued flag was provided without its required value.
+ * - duplicate_flag: a single-value flag was specified more than once.
+ * - unexpected_positional: a non-flag positional argument was provided.
  */
 export type ParamErrorCode =
   | 'missing_required'
   | 'invalid_format'
   | 'mutually_exclusive'
   | 'unknown_flag'
-  | 'missing_value';
+  | 'missing_value'
+  | 'duplicate_flag'
+  | 'unexpected_positional';
 
 /**
  * Structured parameter error.

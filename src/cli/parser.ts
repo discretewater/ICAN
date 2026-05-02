@@ -97,7 +97,16 @@ function parseRaw(rawArgs: readonly string[]): RawParseResult {
         continue;
       }
 
-      // Accumulate for repeated flags
+      // Single-value flags must not be repeated (--policy is the exception)
+      if (arg !== '--policy' && argMap.has(arg)) {
+        errors.push(
+          makeError('duplicate_flag', `Duplicate flag: ${arg}. This flag may only be specified once.`),
+        );
+        i++; // consume the duplicate value but do not overwrite the first
+        continue;
+      }
+
+      // Accumulate for repeated flags (--policy only at this point)
       const existing = argMap.get(arg);
       if (existing !== undefined) {
         if (Array.isArray(existing)) {
@@ -118,9 +127,14 @@ function parseRaw(rawArgs: readonly string[]): RawParseResult {
       errors.push(
         makeError('unknown_flag', `Unknown flag: ${arg}. Use --help for usage information.`),
       );
+    } else {
+      errors.push(
+        makeError(
+          'unexpected_positional',
+          `Unexpected positional argument: "${arg}". The "check" command does not accept positional arguments.`,
+        ),
+      );
     }
-    // Non-flag arguments are silently ignored (they cannot be
-    // consumed by `check` in phase 1).
   }
 
   // Convert Map back to plain Record for downstream consumption
