@@ -11,8 +11,8 @@
  * All test data is synthetic, constructed inline via temp files.
  * No actual fixtures, no golden output, no real IAM samples.
  */
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { writeFileSync, unlinkSync, existsSync } from 'node:fs';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { writeFileSync, unlinkSync, existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -20,6 +20,18 @@ import { runCheck, runCli } from './main.js';
 import type { RunResult } from './main.js';
 import type { CheckCommandOptions } from './types.js';
 import type { ExitCode } from './exit-code.js';
+
+// Import dispatch to access the mocked version for internal error tests
+import { dispatch } from './index.js';
+
+// ── Mock ./index.js to wrap dispatch in a spy for error injection ───
+vi.mock('./index.js', async (importOriginal) => {
+  const actual = (await importOriginal()) as typeof import('./index.js');
+  return {
+    ...actual,
+    dispatch: vi.fn(actual.dispatch),
+  };
+});
 
 // ─── Temp file helpers ──────────────────────────────────────────────
 
@@ -584,5 +596,149 @@ describe('runCli - no process.exit', () => {
 
     expect(typeof process.exitCode).toBe('number');
     expect([0, 1, 2, 3, 4, 10]).toContain(process.exitCode as number);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════
+//  Z06-D05 补正: Structural verification
+// ═════════════════════════════════════════════════════════════════════
+
+describe('CLI entry point - structural verification', () => {
+  it('T28: package.json should have bin.ican set to dist/cli/ican.js', () => {
+    const pkgJson = readFileSync('package.json', 'utf-8');
+    const pkg = JSON.parse(pkgJson) as Record<string, unknown>;
+    expect(pkg.bin).toBeDefined();
+    const bin = pkg.bin as Record<string, string>;
+    expect(bin.ican).toBe('dist/cli/ican.js');
+  });
+
+  it('T29: src/cli/ican.ts source file should exist', () => {
+    expect(existsSync('src/cli/ican.ts')).toBe(true);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════
+//  Z06-D05 补正: Internal error handling in runCli
+// ═════════════════════════════════════════════════════════════════════
+
+describe('runCli - internal error handling', () => {
+  it('T30: runCli should catch internal error and set exitCode 10', async () => {
+    const stderrChunks: string[] = [];
+    const origStderrWrite = process.stderr.write;
+
+    try {
+      process.stderr.write = (chunk: string | Uint8Array) => {
+        stderrChunks.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString());
+        return true;
+      };
+
+      // Make dispatch throw on the next call to simulate an internal error.
+      const mockedDispatch = vi.mocked(dispatch);
+      mockedDispatch.mockImplementationOnce(() => {
+        throw new Error('Simulated internal failure');
+      });
+
+      await runCli([
+        'check',
+        '--policy', '/some/path.json',
+        '--action', 's3:GetObject',
+        '--resource', 'arn:aws:s3:::bucket/*',
+        '--format', 'json',
+      ]);
+
+      expect(process.exitCode).toBe(10);
+      const stderr = stderrChunks.join('');
+      expect(stderr).toContain('Internal error');
+      expect(stderr).toContain('Simulated internal failure');
+    } finally {
+      process.stderr.write = origStderrWrite;
+    }
+  });
+
+  it('T31: runCli internal error should write to stderr but not stdout', async () => {
+    const stdoutChunks: string[] = [];
+    const stderrChunks: string[] = [];
+    const origStdoutWrite = process.stdout.write;
+    const origStderrWrite = process.stderr.write;
+
+    try {
+      process.stdout.write = (chunk: string | Uint8Array) => {
+        stdoutChunks.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString());
+        return true;
+      };
+      process.stderr.write = (chunk: string | Uint8Array) => {
+        stderrChunks.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString());
+        return true;
+      };
+
+      const mockedDispatch = vi.mocked(dispatch);
+      mockedDispatch.mockImplementationOnce(() => {
+        throw new Error('IO boundary internal error');
+      });
+
+      await runCli([
+        'check',
+        '--policy', '/some/path.json',
+        '--action', 's3:GetObject',
+        '--resource', 'arn:aws:s3:::bucket/*',
+        '--format', 'text',
+      ]);
+
+      // stdout must be empty (internal error → no output to stdout)
+      expect(stdoutChunks.join('')).toBe('');
+      // stderr must contain the internal error message
+      const stderr = stderrChunks.join('');
+      expect(stderr.length).toBeGreaterThan(0);
+      expect(stderr).toContain('Internal error');
+      expect(process.exitCode).toBe(10);
+    } finally {
+      process.stdout.write = origStdoutWrite;
+      process.stderr.write = origStderrWrite;
+    }
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════
+//  Z06-D05 补正: Normal path unaffected after mock
+// ═════════════════════════════════════════════════════════════════════
+
+describe('runCli - normal path after internal error injection', () => {
+  it('T32: runCli normal path should still work after mock dispatch', async () => {
+    // After mockImplementationOnce, the dispatch mock reverts to the
+    // real implementation automatically.
+    const policyPath = tmpFile(ALLOW_POLICY_JSON);
+    const stdoutChunks: string[] = [];
+    const stderrChunks: string[] = [];
+
+    const origStdoutWrite = process.stdout.write;
+    const origStderrWrite = process.stderr.write;
+
+    try {
+      process.stdout.write = (chunk: string | Uint8Array) => {
+        stdoutChunks.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString());
+        return true;
+      };
+      process.stderr.write = (chunk: string | Uint8Array) => {
+        stderrChunks.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString());
+        return true;
+      };
+
+      await runCli([
+        'check',
+        '--policy', policyPath,
+        '--action', 's3:GetObject',
+        '--resource', 'arn:aws:s3:::bucket/*',
+        '--format', 'json',
+      ]);
+
+      const stdout = stdoutChunks.join('');
+      expect(stdout.length).toBeGreaterThan(0);
+      expect(() => { JSON.parse(stdout.trim()); }).not.toThrow();
+      expect(stderrChunks.join('')).toBe('');
+      expect(process.exitCode).toBe(0);
+    } finally {
+      process.stdout.write = origStdoutWrite;
+      process.stderr.write = origStderrWrite;
+    }
   });
 });

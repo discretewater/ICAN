@@ -217,53 +217,62 @@ export async function runCheck(options: CheckCommandOptions): Promise<RunResult>
  *                i.e., `process.argv.slice(2)`.
  */
 export async function runCli(rawArgs: readonly string[]): Promise<void> {
-  const dispatchResult = dispatch(rawArgs);
+  try {
+    const dispatchResult = dispatch(rawArgs);
 
-  // ── Dispatch-level: help ──────────────────────────────────────
-  if (dispatchResult.kind === 'help') {
-    process.stdout.write(dispatchResult.helpText + '\n');
-    process.exitCode = 0;
-    return;
+    // ── Dispatch-level: help ──────────────────────────────────────
+    if (dispatchResult.kind === 'help') {
+      process.stdout.write(dispatchResult.helpText + '\n');
+      process.exitCode = 0;
+      return;
+    }
+
+    // ── Dispatch-level: unknown subcommand error ─────────────────
+    if (dispatchResult.kind === 'error') {
+      const errors: ErrorEntry[] = [{ code: 'UNKNOWN_COMMAND', message: dispatchResult.message }];
+      const formatted = formatErrorOutput(errors, 'text');
+      const stderr = serializeErrorOutput(formatted);
+      process.stderr.write(stderr + '\n');
+      process.exitCode = mapErrorsToExitCode(errors);
+      return;
+    }
+
+    // ── Subcommand-level: parse_result ───────────────────────────
+    const parseResult = dispatchResult.parseResult;
+
+    if (parseResult.kind === 'help') {
+      process.stdout.write(parseResult.helpText + '\n');
+      process.exitCode = 0;
+      return;
+    }
+
+    if (parseResult.kind === 'error') {
+      // ParamError[] conforms to ErrorEntry[] structurally.
+      const formatted = formatErrorOutput(parseResult.errors, 'text');
+      const stderr = serializeErrorOutput(formatted);
+      process.stderr.write(stderr + '\n');
+      process.exitCode = mapErrorsToExitCode(parseResult.errors);
+      return;
+    }
+
+    // ── Success: run the full check pipeline ─────────────────────
+    const result = await runCheck(parseResult.options);
+
+    if (result.stdout.length > 0) {
+      process.stdout.write(result.stdout + '\n');
+    }
+
+    if (result.stderr.length > 0) {
+      process.stderr.write(result.stderr + '\n');
+    }
+
+    process.exitCode = result.exitCode;
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? `Internal error: ${error.message}`
+        : 'Internal error: unexpected failure';
+    process.stderr.write(message + '\n');
+    process.exitCode = 10; // EXIT_CODE.INTERNAL_ERROR
   }
-
-  // ── Dispatch-level: unknown subcommand error ─────────────────
-  if (dispatchResult.kind === 'error') {
-    const errors: ErrorEntry[] = [{ code: 'UNKNOWN_COMMAND', message: dispatchResult.message }];
-    const formatted = formatErrorOutput(errors, 'text');
-    const stderr = serializeErrorOutput(formatted);
-    process.stderr.write(stderr + '\n');
-    process.exitCode = mapErrorsToExitCode(errors);
-    return;
-  }
-
-  // ── Subcommand-level: parse_result ───────────────────────────
-  const parseResult = dispatchResult.parseResult;
-
-  if (parseResult.kind === 'help') {
-    process.stdout.write(parseResult.helpText + '\n');
-    process.exitCode = 0;
-    return;
-  }
-
-  if (parseResult.kind === 'error') {
-    // ParamError[] conforms to ErrorEntry[] structurally.
-    const formatted = formatErrorOutput(parseResult.errors, 'text');
-    const stderr = serializeErrorOutput(formatted);
-    process.stderr.write(stderr + '\n');
-    process.exitCode = mapErrorsToExitCode(parseResult.errors);
-    return;
-  }
-
-  // ── Success: run the full check pipeline ─────────────────────
-  const result = await runCheck(parseResult.options);
-
-  if (result.stdout.length > 0) {
-    process.stdout.write(result.stdout + '\n');
-  }
-
-  if (result.stderr.length > 0) {
-    process.stderr.write(result.stderr + '\n');
-  }
-
-  process.exitCode = result.exitCode;
 }
