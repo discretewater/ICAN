@@ -214,14 +214,62 @@ describe('mapErrorsToExitCode – heuristic classification', () => {
     expect(result).toBe(EXIT_CODE.ERROR);
   });
 
-  it('T24: multiple errors uses first error code for classification', () => {
-    // First error is internal → 10, second is unsupported.
+  it('T24: internal + unsupported errors → 10 (full-list priority scan: internal beats unsupported)', () => {
+    // Priority scan across all errors: INTERNAL > UNSUPPORTED.
     const result = mapErrorsToExitCode([
       { code: 'INTERNAL_ERROR', message: 'First error' },
       { code: 'UNSUPPORTED_FEATURE', message: 'Second error' },
     ]);
     expect(result).toBe(10);
     expect(result).toBe(EXIT_CODE.INTERNAL_ERROR);
+  });
+
+  // ─── Priority-scan tests: full-list scanning (Z06-D04 correction 3) ───
+
+  it('T36: input error (first) + internal (second) → 10 — internal always wins', () => {
+    const result = mapErrorsToExitCode([
+      { code: 'FILE_NOT_FOUND', message: 'Input file not found' },
+      { code: 'INTERNAL_ERROR', message: 'Unexpected runtime failure' },
+    ]);
+    expect(result).toBe(10);
+    expect(result).toBe(EXIT_CODE.INTERNAL_ERROR);
+  });
+
+  it('T37: input error (first) + unsupported (second) → 3 — unsupported above general', () => {
+    const result = mapErrorsToExitCode([
+      { code: 'INVALID_JSON', message: 'Failed to parse JSON' },
+      { code: 'UNSUPPORTED_FEATURE', message: 'Feature not yet supported' },
+    ]);
+    expect(result).toBe(3);
+    expect(result).toBe(EXIT_CODE.INDETERMINATE);
+  });
+
+  it('T38: validation error (first) + unsupported (second) → 3 — unsupported above general', () => {
+    const result = mapErrorsToExitCode([
+      { code: 'missing_required', message: 'Missing required parameter' },
+      { code: 'UNSUPPORTED', message: 'Unsupported feature' },
+    ]);
+    expect(result).toBe(3);
+    expect(result).toBe(EXIT_CODE.INDETERMINATE);
+  });
+
+  it('T39: unsupported (first) + internal (second) → 10 — internal beats unsupported', () => {
+    const result = mapErrorsToExitCode([
+      { code: 'UNSUPPORTED', message: 'Unsupported feature' },
+      { code: 'INTERNAL_ERROR', message: 'Unexpected runtime failure' },
+    ]);
+    expect(result).toBe(10);
+    expect(result).toBe(EXIT_CODE.INTERNAL_ERROR);
+  });
+
+  it('T40: three input/param errors (no internal/unsupported) → 2 — all general errors', () => {
+    const result = mapErrorsToExitCode([
+      { code: 'missing_required', message: 'Missing required parameter' },
+      { code: 'FILE_NOT_FOUND', message: 'Input file not found' },
+      { code: 'INVALID_JSON', message: 'Failed to parse JSON' },
+    ]);
+    expect(result).toBe(2);
+    expect(result).toBe(EXIT_CODE.ERROR);
   });
 });
 

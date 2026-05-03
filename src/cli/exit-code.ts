@@ -97,22 +97,27 @@ export function mapDecisionToExitCode(
 }
 
 /**
- * Map a list of structured errors to an exit code via heuristic
- * classification based on the first error's code field.
+ * Map a list of structured errors to an exit code via full-list
+ * priority scanning (not limited to the first error).
  *
- * Classification rules (checked in order):
+ * Priority rules (highest to lowest), scanning ALL errors:
  * 1. Empty error list                                    → 2 (ERROR)
- * 2. First error code contains "INTERNAL" (case-insensitive)
- *    or "INTERNAL_ERROR"                                 → 10 (INTERNAL_ERROR)
- * 3. First error code contains "UNSUPPORTED" (case-insensitive)
+ * 2. Any error code contains "INTERNAL" (case-insensitive)
+ *                                                        → 10 (INTERNAL_ERROR)
+ * 3. Any error code contains "UNSUPPORTED" (case-insensitive)
  *                                                        → 3 (INDETERMINATE)
  * 4. All other errors (input, parameter, validation)     → 2 (ERROR)
+ *
+ * Priority order: INTERNAL > UNSUPPORTED > other.
+ * This prevents internal/unsupported errors from being
+ * masked by lower-priority input/validation errors.
  *
  * Does NOT call process.exit, write to stdout/stderr, or import
  * engine functions.
  *
  * @param errors  List of error entries with `code` and `message` fields.
- *                Only the first error's code is used for classification.
+ *                All errors are scanned to determine the highest-priority
+ *                exit code.
  * @returns ExitCode (2, 3, or 10).
  */
 export function mapErrorsToExitCode(
@@ -122,18 +127,22 @@ export function mapErrorsToExitCode(
     return EXIT_CODE.ERROR;
   }
 
-  const code = errors[0]!.code.toUpperCase();
-
-  // Check for internal errors first (highest priority).
-  if (code.includes('INTERNAL') || code.includes('INTERNAL_ERROR')) {
-    return EXIT_CODE.INTERNAL_ERROR;
+  // Priority 1 (highest): check for internal errors across ALL errors.
+  for (const err of errors) {
+    const code = err.code.toUpperCase();
+    if (code.includes('INTERNAL')) {
+      return EXIT_CODE.INTERNAL_ERROR;
+    }
   }
 
-  // Check for unsupported features.
-  if (code.includes('UNSUPPORTED')) {
-    return EXIT_CODE.INDETERMINATE;
+  // Priority 2: check for unsupported features across ALL errors.
+  for (const err of errors) {
+    const code = err.code.toUpperCase();
+    if (code.includes('UNSUPPORTED')) {
+      return EXIT_CODE.INDETERMINATE;
+    }
   }
 
-  // Default: input, parameter, or validation errors.
+  // Priority 3 (lowest): input, parameter, or validation errors.
   return EXIT_CODE.ERROR;
 }
