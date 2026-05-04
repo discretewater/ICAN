@@ -1,0 +1,12 @@
+{
+  "id": "indeterminate-unsupported-condition",
+  "category": "indeterminate",
+  "purpose": "Verify unsupported feature (NotAction) causes INDETERMINATE with exitCode 3.",
+  "expectedFinalDecision": "IMPLICIT_DENY",
+  "expectedDecisionStatus": "INDETERMINATE",
+  "expectedExitCode": 3,
+  "notes": "Policy uses NotAction which is unsupported in phase 1. Should produce INDETERMINATE result.",
+  "source": "synthetic",
+  "relatedDesign": "Design Book §10.8, §10.9",
+  "goldenOutputDeferred": true
+}

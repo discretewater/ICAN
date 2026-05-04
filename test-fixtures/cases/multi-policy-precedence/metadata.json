@@ -1,0 +1,12 @@
+{
+  "id": "multi-policy-precedence",
+  "category": "multi-policy",
+  "purpose": "Verify cross-policy evaluation: Allow in policy-01, Deny in policy-02 for matching resource. Deny should win.",
+  "expectedFinalDecision": "EXPLICIT_DENY",
+  "expectedDecisionStatus": "DETERMINATE",
+  "expectedExitCode": 1,
+  "notes": "Two policies: policy-01 allows s3:GetObject on bucket/*, policy-02 denies on bucket/secret/*. Request targets secret/data.txt → Deny wins.",
+  "source": "synthetic",
+  "relatedDesign": "Design Book §10.1",
+  "goldenOutputDeferred": true
+}

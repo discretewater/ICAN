@@ -1,0 +1,12 @@
+{
+  "id": "explicit-deny-basic",
+  "category": "explicit-deny",
+  "purpose": "Verify Deny statement takes precedence over Allow, producing EXPLICIT_DENY with exitCode 1.",
+  "expectedFinalDecision": "EXPLICIT_DENY",
+  "expectedDecisionStatus": "DETERMINATE",
+  "expectedExitCode": 1,
+  "notes": "Single policy with both Deny and Allow statements for same action/resource. Deny should win.",
+  "source": "synthetic",
+  "relatedDesign": "Design Book §10.1, §10.8",
+  "goldenOutputDeferred": true
+}

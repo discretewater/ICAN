@@ -1,0 +1,5 @@
+{
+  "action": "s3:GetObject",
+  "resource": "arn:aws:s3:::example-bucket/photo.jpg",
+  "context": {}
+}

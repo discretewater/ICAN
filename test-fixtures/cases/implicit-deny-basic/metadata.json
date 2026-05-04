@@ -1,0 +1,12 @@
+{
+  "id": "implicit-deny-basic",
+  "category": "implicit-deny",
+  "purpose": "Verify no applicable Allow results in IMPLICIT_DENY with exitCode 4.",
+  "expectedFinalDecision": "IMPLICIT_DENY",
+  "expectedDecisionStatus": "DETERMINATE",
+  "expectedExitCode": 4,
+  "notes": "Policy only allows s3:PutObject, but request is for s3:GetObject. No matching Allow → implicit deny.",
+  "source": "synthetic",
+  "relatedDesign": "Design Book §10.1, §10.8",
+  "goldenOutputDeferred": true
+}

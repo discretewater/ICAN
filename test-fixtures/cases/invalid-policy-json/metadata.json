@@ -1,0 +1,10 @@
+{
+  "id": "invalid-policy-json",
+  "category": "invalid-input",
+  "purpose": "Verify malformed JSON policy causes input error with exitCode 2.",
+  "expectedExitCode": 2,
+  "notes": "policy-01.json is intentionally malformed (missing closing brace). Should trigger JSON parse error.",
+  "source": "synthetic",
+  "relatedDesign": "Design Book §10.8",
+  "goldenOutputDeferred": true
+}

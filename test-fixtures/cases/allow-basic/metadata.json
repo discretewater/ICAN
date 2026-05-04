@@ -1,0 +1,12 @@
+{
+  "id": "allow-basic",
+  "category": "allow",
+  "purpose": "Verify single Allow statement matches action and resource, producing ALLOW with exitCode 0.",
+  "expectedFinalDecision": "ALLOW",
+  "expectedDecisionStatus": "DETERMINATE",
+  "expectedExitCode": 0,
+  "notes": "Minimal synthetic case. One policy with one Allow statement. Action and resource both match.",
+  "source": "synthetic",
+  "relatedDesign": "Design Book §10.1",
+  "goldenOutputDeferred": true
+}
