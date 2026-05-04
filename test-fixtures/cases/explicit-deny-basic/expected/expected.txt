@@ -1,0 +1,18 @@
+Evaluation Report
+---
+decision:
+  EXPLICIT_DENY
+decisionStatus:
+  DETERMINATE
+summary:
+  Final decision: EXPLICIT_DENY
+matchedStatements:
+  deny:
+    stmt:policy-01.json:0:7b8a3b6c
+  allow:
+    stmt:policy-01.json:0:a0ffb188
+pathTrace:
+  stmt:policy-01.json:0:7b8a3b6c: Deny [applicable] source: policyId: policy-01.json:0
+  stmt:policy-01.json:0:a0ffb188: Allow [applicable] source: policyId: policy-01.json:0
+diagnostics:
+  none

@@ -1,0 +1,45 @@
+{
+  "finalDecision": "ALLOW",
+  "decisionStatus": "DETERMINATE",
+  "summary": "Final decision: ALLOW",
+  "matchedDenyStatementIds": [],
+  "matchedAllowStatementIds": [
+    "stmt:policy-01.json:0:a0ffb188"
+  ],
+  "statementResults": [
+    {
+      "statementId": "stmt:policy-01.json:0:a0ffb188",
+      "effect": "Allow",
+      "actionMatched": true,
+      "resourceMatched": true,
+      "conditionMatched": true,
+      "applicable": true,
+      "nonApplicableReasons": [],
+      "unsupportedFeatures": []
+    }
+  ],
+  "pathTrace": [
+    {
+      "statementId": "stmt:policy-01.json:0:a0ffb188",
+      "effect": "Allow",
+      "actionMatched": true,
+      "resourceMatched": true,
+      "conditionMatched": true,
+      "applicable": true,
+      "nonApplicableReasons": [],
+      "unsupportedFeatures": [],
+      "source": {
+        "sourcePolicyId": "policy-01.json:0",
+        "sourcePolicyPath": "/home/wo/.gong/ican/车间/test-fixtures/cases/allow-basic/policies/policy-01.json",
+        "sourcePolicyIndex": 0,
+        "sourceStatementIndex": 0
+      }
+    }
+  ],
+  "diagnostics": {
+    "hasInvalid": false,
+    "invalidInputs": [],
+    "hasUnsupported": false,
+    "unsupportedFeatures": []
+  }
+}

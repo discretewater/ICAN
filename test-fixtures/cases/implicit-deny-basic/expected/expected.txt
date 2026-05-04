@@ -1,0 +1,14 @@
+Evaluation Report
+---
+decision:
+  IMPLICIT_DENY
+decisionStatus:
+  DETERMINATE
+summary:
+  Final decision: IMPLICIT_DENY
+matchedStatements:
+  none
+pathTrace:
+  stmt:policy-01.json:0:0a9ae866: Allow [not-applicable] source: policyId: policy-01.json:0
+diagnostics:
+  none

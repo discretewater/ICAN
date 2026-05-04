@@ -1,0 +1,73 @@
+{
+  "finalDecision": "EXPLICIT_DENY",
+  "decisionStatus": "DETERMINATE",
+  "summary": "Final decision: EXPLICIT_DENY",
+  "matchedDenyStatementIds": [
+    "stmt:policy-02.json:1:86ab9403"
+  ],
+  "matchedAllowStatementIds": [
+    "stmt:policy-01.json:0:a0ffb188"
+  ],
+  "statementResults": [
+    {
+      "statementId": "stmt:policy-01.json:0:a0ffb188",
+      "effect": "Allow",
+      "actionMatched": true,
+      "resourceMatched": true,
+      "conditionMatched": true,
+      "applicable": true,
+      "nonApplicableReasons": [],
+      "unsupportedFeatures": []
+    },
+    {
+      "statementId": "stmt:policy-02.json:1:86ab9403",
+      "effect": "Deny",
+      "actionMatched": true,
+      "resourceMatched": true,
+      "conditionMatched": true,
+      "applicable": true,
+      "nonApplicableReasons": [],
+      "unsupportedFeatures": []
+    }
+  ],
+  "pathTrace": [
+    {
+      "statementId": "stmt:policy-01.json:0:a0ffb188",
+      "effect": "Allow",
+      "actionMatched": true,
+      "resourceMatched": true,
+      "conditionMatched": true,
+      "applicable": true,
+      "nonApplicableReasons": [],
+      "unsupportedFeatures": [],
+      "source": {
+        "sourcePolicyId": "policy-01.json:0",
+        "sourcePolicyPath": "/home/wo/.gong/ican/车间/test-fixtures/cases/multi-policy-precedence/policies/policy-01.json",
+        "sourcePolicyIndex": 0,
+        "sourceStatementIndex": 0
+      }
+    },
+    {
+      "statementId": "stmt:policy-02.json:1:86ab9403",
+      "effect": "Deny",
+      "actionMatched": true,
+      "resourceMatched": true,
+      "conditionMatched": true,
+      "applicable": true,
+      "nonApplicableReasons": [],
+      "unsupportedFeatures": [],
+      "source": {
+        "sourcePolicyId": "policy-02.json:1",
+        "sourcePolicyPath": "/home/wo/.gong/ican/车间/test-fixtures/cases/multi-policy-precedence/policies/policy-02.json",
+        "sourcePolicyIndex": 1,
+        "sourceStatementIndex": 0
+      }
+    }
+  ],
+  "diagnostics": {
+    "hasInvalid": false,
+    "invalidInputs": [],
+    "hasUnsupported": false,
+    "unsupportedFeatures": []
+  }
+}

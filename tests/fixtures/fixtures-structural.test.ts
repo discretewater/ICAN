@@ -36,8 +36,6 @@ const REQUIRED_METADATA_FIELDS = [
   'goldenOutputDeferred',
 ] as const;
 
-const GOLDEN_OUTPUT_EXTENSIONS = ['.json', '.txt'];
-
 // ─── Helpers ────────────────────────────────────────────────────────
 
 function caseDir(name: string): string {
@@ -122,21 +120,31 @@ describe('Z07-D02 fixtures – metadata.json', () => {
   }
 });
 
-// ─── Tests: No golden output files ───────────────────────────────────
+// ─── Tests: Golden output files exist (D03) ──────────────────────────
+//
+// Replaces the Z07-D02 "no golden output" check; now that D03 has
+// produced golden outputs, we verify the three expected files exist
+// per case.
 
-describe('Z07-D02 fixtures – no golden output (deferred to D03)', () => {
+const EXPECTED_GOLDEN_FILES = [
+  'expected.json',
+  'expected.txt',
+  'expected-exit-code.txt',
+] as const;
+
+describe('Z07-D03 fixtures – golden output files exist', () => {
   for (const caseName of EXPECTED_CASES) {
-    it(`T11-${caseName}: expected/ directory contains no JSON or TXT golden output`, () => {
+    it(`T11-${caseName}: expected/ directory exists`, () => {
       const expectedDir = join(caseDir(caseName), 'expected');
-      if (!existsSync(expectedDir)) return; // OK if directory doesn't exist
-
-      const files = readdirSync(expectedDir);
-      const goldenFiles = files.filter((f) =>
-        GOLDEN_OUTPUT_EXTENSIONS.some((ext) => f.endsWith(ext)),
-      );
-      // Only .gitkeep is allowed; any .json or .txt would be golden output
-      expect(goldenFiles.length).toBe(0);
+      expect(existsSync(expectedDir)).toBe(true);
     });
+
+    for (const goldenFile of EXPECTED_GOLDEN_FILES) {
+      it(`T11-${caseName}-${goldenFile}: ${goldenFile} exists`, () => {
+        const path = join(caseDir(caseName), 'expected', goldenFile);
+        expect(existsSync(path)).toBe(true);
+      });
+    }
   }
 });
 

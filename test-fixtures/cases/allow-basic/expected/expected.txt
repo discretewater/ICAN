@@ -1,0 +1,15 @@
+Evaluation Report
+---
+decision:
+  ALLOW
+decisionStatus:
+  DETERMINATE
+summary:
+  Final decision: ALLOW
+matchedStatements:
+  allow:
+    stmt:policy-01.json:0:a0ffb188
+pathTrace:
+  stmt:policy-01.json:0:a0ffb188: Allow [applicable] source: policyId: policy-01.json:0
+diagnostics:
+  none

@@ -1,0 +1,47 @@
+{
+  "finalDecision": "IMPLICIT_DENY",
+  "decisionStatus": "DETERMINATE",
+  "summary": "Final decision: IMPLICIT_DENY",
+  "matchedDenyStatementIds": [],
+  "matchedAllowStatementIds": [],
+  "statementResults": [
+    {
+      "statementId": "stmt:policy-01.json:0:0a9ae866",
+      "effect": "Allow",
+      "actionMatched": false,
+      "resourceMatched": false,
+      "conditionMatched": false,
+      "applicable": false,
+      "nonApplicableReasons": [
+        "action_not_matched"
+      ],
+      "unsupportedFeatures": []
+    }
+  ],
+  "pathTrace": [
+    {
+      "statementId": "stmt:policy-01.json:0:0a9ae866",
+      "effect": "Allow",
+      "actionMatched": false,
+      "resourceMatched": false,
+      "conditionMatched": false,
+      "applicable": false,
+      "nonApplicableReasons": [
+        "action_not_matched"
+      ],
+      "unsupportedFeatures": [],
+      "source": {
+        "sourcePolicyId": "policy-01.json:0",
+        "sourcePolicyPath": "/home/wo/.gong/ican/车间/test-fixtures/cases/implicit-deny-basic/policies/policy-01.json",
+        "sourcePolicyIndex": 0,
+        "sourceStatementIndex": 0
+      }
+    }
+  ],
+  "diagnostics": {
+    "hasInvalid": false,
+    "invalidInputs": [],
+    "hasUnsupported": false,
+    "unsupportedFeatures": []
+  }
+}
