@@ -42,7 +42,7 @@
       "unsupportedFeatures": [],
       "source": {
         "sourcePolicyId": "policy-01.json:0",
-        "sourcePolicyPath": "/home/wo/.gong/ican/车间/test-fixtures/cases/multi-policy-precedence/policies/policy-01.json",
+        "sourcePolicyPath": "<WORKSHOP_ROOT>/test-fixtures/cases/multi-policy-precedence/policies/policy-01.json",
         "sourcePolicyIndex": 0,
         "sourceStatementIndex": 0
       }
@@ -58,7 +58,7 @@
       "unsupportedFeatures": [],
       "source": {
         "sourcePolicyId": "policy-02.json:1",
-        "sourcePolicyPath": "/home/wo/.gong/ican/车间/test-fixtures/cases/multi-policy-precedence/policies/policy-02.json",
+        "sourcePolicyPath": "<WORKSHOP_ROOT>/test-fixtures/cases/multi-policy-precedence/policies/policy-02.json",
         "sourcePolicyIndex": 1,
         "sourceStatementIndex": 0
       }

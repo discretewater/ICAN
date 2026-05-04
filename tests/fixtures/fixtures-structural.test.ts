@@ -1,5 +1,5 @@
 /**
- * Z07-D02: Actual fixtures structural integrity tests.
+ * Z07-D02 / Z07-D03: Actual fixtures structural integrity tests.
  *
  * Verifies that the minimal actual fixtures created in
  * test-fixtures/cases/ are structurally correct:
@@ -7,7 +7,7 @@
  * - Each case has a metadata.json with required fields
  * - Each non-invalid case has valid policy JSON files
  * - Each case has a request.json
- * - No golden output files exist (deferred to D03)
+ * - Golden output files exist (generated in D03)
  * - All cases are marked as synthetic (no real-world samples)
  */
 
@@ -112,10 +112,10 @@ describe('Z07-D02 fixtures – metadata.json', () => {
       expect(meta.source).toBe('synthetic');
     });
 
-    it(`T10-${caseName}: metadata goldenOutputDeferred is true`, () => {
+    it(`T10-${caseName}: metadata goldenOutputDeferred is false (golden outputs generated in D03)`, () => {
       const path = join(caseDir(caseName), 'metadata.json');
       const meta = readJson(path) as Record<string, unknown>;
-      expect(meta.goldenOutputDeferred).toBe(true);
+      expect(meta.goldenOutputDeferred).toBe(false);
     });
   }
 });

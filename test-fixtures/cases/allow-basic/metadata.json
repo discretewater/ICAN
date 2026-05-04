@@ -8,5 +8,5 @@
   "notes": "Minimal synthetic case. One policy with one Allow statement. Action and resource both match.",
   "source": "synthetic",
   "relatedDesign": "Design Book §10.1",
-  "goldenOutputDeferred": true
+  "goldenOutputDeferred": false
 }

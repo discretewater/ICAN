@@ -6,5 +6,5 @@
   "notes": "policy-01.json is intentionally malformed (missing closing brace). Should trigger JSON parse error.",
   "source": "synthetic",
   "relatedDesign": "Design Book §10.8",
-  "goldenOutputDeferred": true
+  "goldenOutputDeferred": false
 }

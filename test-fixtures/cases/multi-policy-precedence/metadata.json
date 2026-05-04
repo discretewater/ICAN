@@ -8,5 +8,5 @@
   "notes": "Two policies: policy-01 allows s3:GetObject on bucket/*, policy-02 denies on bucket/secret/*. Request targets secret/data.txt → Deny wins.",
   "source": "synthetic",
   "relatedDesign": "Design Book §10.1",
-  "goldenOutputDeferred": true
+  "goldenOutputDeferred": false
 }

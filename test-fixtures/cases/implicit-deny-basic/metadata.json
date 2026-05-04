@@ -8,5 +8,5 @@
   "notes": "Policy only allows s3:PutObject, but request is for s3:GetObject. No matching Allow → implicit deny.",
   "source": "synthetic",
   "relatedDesign": "Design Book §10.1, §10.8",
-  "goldenOutputDeferred": true
+  "goldenOutputDeferred": false
 }

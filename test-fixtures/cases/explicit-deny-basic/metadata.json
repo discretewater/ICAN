@@ -8,5 +8,5 @@
   "notes": "Single policy with both Deny and Allow statements for same action/resource. Deny should win.",
   "source": "synthetic",
   "relatedDesign": "Design Book §10.1, §10.8",
-  "goldenOutputDeferred": true
+  "goldenOutputDeferred": false
 }

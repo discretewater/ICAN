@@ -1,12 +1,12 @@
 {
   "id": "indeterminate-unsupported-condition",
   "category": "indeterminate",
-  "purpose": "Verify unsupported feature (NotAction) causes INDETERMINATE with exitCode 3.",
+  "purpose": "Verify unsupported Condition operator (StringNotEquals) causes INDETERMINATE with exitCode 3.",
   "expectedFinalDecision": "IMPLICIT_DENY",
   "expectedDecisionStatus": "INDETERMINATE",
   "expectedExitCode": 3,
-  "notes": "Policy uses NotAction which is unsupported in phase 1. Should produce INDETERMINATE result.",
+  "notes": "StringNotEquals is a valid IAM operator not in the supported set. Condition evaluator marks it as unsupported_feature → INDETERMINATE.",
   "source": "synthetic",
   "relatedDesign": "Design Book §10.8, §10.9",
-  "goldenOutputDeferred": true
+  "goldenOutputDeferred": false
 }

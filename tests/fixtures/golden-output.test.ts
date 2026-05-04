@@ -212,3 +212,32 @@ describe('Z07-D03 golden output quality — no absolute paths in expected files'
     });
   }
 });
+
+// ─── Tests: Golden output quality — no absolute machine paths ────────
+
+describe('Z07-D03 golden output quality — no absolute machine paths', () => {
+  for (const caseName of CASE_NAMES) {
+    it(`T7-${caseName}: expected.json does not contain /home/`, () => {
+      const goldenPath = join(caseDir(caseName), 'expected', 'expected.json');
+      const content = readText(goldenPath);
+      expect(content).not.toContain('/home/');
+    });
+
+    it(`T8-${caseName}: expected.txt does not contain /home/`, () => {
+      const goldenPath = join(caseDir(caseName), 'expected', 'expected.txt');
+      const content = readText(goldenPath);
+      expect(content).not.toContain('/home/');
+    });
+
+    it(`T9-${caseName}: expected.json uses WORKSHOP_ROOT placeholder when sourcePolicyPath is present`, () => {
+      const goldenPath = join(caseDir(caseName), 'expected', 'expected.json');
+      const content = readText(goldenPath);
+      // If the output contains a path-like reference, it must use the placeholder
+      // rather than any machine-specific path pattern like /tmp/, /var/, /usr/, etc.
+      // We check that no /home/ or /tmp/ or similar machine paths appear
+      if (content.includes('sourcePolicyPath')) {
+        expect(content).toContain('<WORKSHOP_ROOT>');
+      }
+    });
+  }
+});

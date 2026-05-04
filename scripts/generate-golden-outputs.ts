@@ -37,6 +37,17 @@ const CASE_NAMES = [
 
 // ─── Helpers ──────────────────────────────────────────────────────
 
+/**
+ * Normalize a string by replacing the absolute project root path
+ * with the placeholder `<WORKSHOP_ROOT>/`.
+ *
+ * This ensures golden outputs are portable across machines and
+ * checkout directories.
+ */
+function normalizePaths(raw: string): string {
+  return raw.replaceAll(PROJECT_ROOT, '<WORKSHOP_ROOT>');
+}
+
 function readJson(path: string): unknown {
   return JSON.parse(readFileSync(path, 'utf-8'));
 }
@@ -101,13 +112,15 @@ async function generateForCase(caseName: string): Promise<void> {
   };
   const jsonResult = await runCheck(jsonOptions);
   // For error cases, stderr is non-empty; for success cases, stdout is non-empty
-  const jsonOutput = jsonResult.stderr.length > 0 ? jsonResult.stderr : jsonResult.stdout;
+  const jsonRaw = jsonResult.stderr.length > 0 ? jsonResult.stderr : jsonResult.stdout;
+  const jsonOutput = normalizePaths(jsonRaw);
   writeFileSync(join(outDir, 'expected.json'), jsonOutput + '\n', 'utf-8');
 
   // ── Generate Text format output ────────────────────────────
   const textOptions: CheckCommandOptions = { ...jsonOptions, format: 'text' };
   const textResult = await runCheck(textOptions);
-  const textOutput = textResult.stderr.length > 0 ? textResult.stderr : textResult.stdout;
+  const textRaw = textResult.stderr.length > 0 ? textResult.stderr : textResult.stdout;
+  const textOutput = normalizePaths(textRaw);
   writeFileSync(join(outDir, 'expected.txt'), textOutput + '\n', 'utf-8');
 
   // ── Write exit code ────────────────────────────────────────

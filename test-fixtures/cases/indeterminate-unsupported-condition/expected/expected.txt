@@ -1,1 +1,1 @@
-PolicyDocument must contain a Statement field
+Condition operator "StringNotEquals" is not supported in phase 1. Supported: StringEquals, StringLike, Bool, IpAddress

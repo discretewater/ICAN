@@ -42,7 +42,7 @@
       "unsupportedFeatures": [],
       "source": {
         "sourcePolicyId": "policy-01.json:0",
-        "sourcePolicyPath": "/home/wo/.gong/ican/车间/test-fixtures/cases/explicit-deny-basic/policies/policy-01.json",
+        "sourcePolicyPath": "<WORKSHOP_ROOT>/test-fixtures/cases/explicit-deny-basic/policies/policy-01.json",
         "sourcePolicyIndex": 0,
         "sourceStatementIndex": 0
       }
@@ -58,7 +58,7 @@
       "unsupportedFeatures": [],
       "source": {
         "sourcePolicyId": "policy-01.json:0",
-        "sourcePolicyPath": "/home/wo/.gong/ican/车间/test-fixtures/cases/explicit-deny-basic/policies/policy-01.json",
+        "sourcePolicyPath": "<WORKSHOP_ROOT>/test-fixtures/cases/explicit-deny-basic/policies/policy-01.json",
         "sourcePolicyIndex": 0,
         "sourceStatementIndex": 1
       }
