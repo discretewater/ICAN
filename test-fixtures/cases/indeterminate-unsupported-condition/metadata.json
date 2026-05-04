@@ -1,11 +1,10 @@
 {
   "id": "indeterminate-unsupported-condition",
   "category": "indeterminate",
-  "purpose": "Verify unsupported Condition operator (StringNotEquals) causes INDETERMINATE with exitCode 3.",
-  "expectedFinalDecision": "IMPLICIT_DENY",
-  "expectedDecisionStatus": "INDETERMINATE",
+  "purpose": "Verify unsupported Condition operator (StringNotEquals) produces POLICY_UNSUPPORTED_FEATURE error output with exitCode 3.",
+  "expectedErrorCode": "POLICY_UNSUPPORTED_FEATURE",
   "expectedExitCode": 3,
-  "notes": "StringNotEquals is a valid IAM operator not in the supported set. Condition evaluator marks it as unsupported_feature → INDETERMINATE.",
+  "notes": "This case represents the unsupported feature error output path. StringNotEquals is not in the supported operators list (StringEquals/StringLike/Bool/IpAddress). The golden output is an error structure, not a full EvaluationResult. Prior to D03 golden generation, NotAction was used but rejected by zod as POLICY_INVALID_SHAPE (exitCode 2).",
   "source": "synthetic",
   "relatedDesign": "Design Book §10.8, §10.9",
   "goldenOutputDeferred": false

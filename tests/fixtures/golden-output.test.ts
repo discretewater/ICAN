@@ -213,6 +213,70 @@ describe('Z07-D03 golden output quality — no absolute paths in expected files'
   }
 });
 
+// ─── Tests: Metadata ↔ golden output consistency ──────────────────
+//
+// Verifies that metadata.json declared expectations are consistent
+// with the actual golden output files.  This prevents drift between
+// metadata declarations and pre-generated golden outputs.
+
+describe('Z07-D03 metadata — golden output consistency', () => {
+  for (const caseName of CASE_NAMES) {
+    const meta = readJson(join(caseDir(caseName), 'metadata.json')) as Record<string, unknown>;
+
+    // ── expectedErrorCode ──────────────────────────────────────────
+    it(`T10-${caseName}: if metadata has expectedErrorCode, it appears in expected.json errors[*].code`, () => {
+      if (!('expectedErrorCode' in meta)) {
+        // Nothing to check – field is optional.
+        expect(true).toBe(true);
+        return;
+      }
+      const expectedCode = meta.expectedErrorCode as string;
+      const golden = readJson(join(caseDir(caseName), 'expected', 'expected.json')) as {
+        errors?: Array<{ code: string }>;
+      };
+      expect(golden.errors).toBeDefined();
+      const codes = (golden.errors ?? []).map((e) => e.code);
+      expect(codes).toContain(expectedCode);
+    });
+
+    // ── expectedExitCode ───────────────────────────────────────────
+    it(`T11-${caseName}: metadata expectedExitCode equals expected-exit-code.txt`, () => {
+      if (!('expectedExitCode' in meta)) {
+        expect(true).toBe(true);
+        return;
+      }
+      const expectedCode = meta.expectedExitCode as number;
+      const goldenRaw = readText(
+        join(caseDir(caseName), 'expected', 'expected-exit-code.txt'),
+      ).trim();
+      expect(Number(goldenRaw)).toBe(expectedCode);
+    });
+
+    // ── expectedFinalDecision ──────────────────────────────────────
+    it(`T12-${caseName}: metadata declares expectedFinalDecision only when golden has finalDecision`, () => {
+      const golden = readJson(join(caseDir(caseName), 'expected', 'expected.json')) as {
+        finalDecision?: string;
+      };
+      const hasGoldenFinalDecision = 'finalDecision' in golden && golden.finalDecision !== undefined;
+      const hasMetaFinalDecision = 'expectedFinalDecision' in meta;
+
+      if (hasGoldenFinalDecision) {
+        // Golden has finalDecision; metadata may (or may not) declare it.
+        // We don't enforce the reverse (metadata must declare if golden has).
+        expect(true).toBe(true);
+      } else {
+        // Golden does NOT have finalDecision → metadata must NOT declare it.
+        expect(hasMetaFinalDecision).toBe(false);
+      }
+    });
+
+    // ── goldenOutputDeferred ───────────────────────────────────────
+    it(`T13-${caseName}: metadata goldenOutputDeferred is false`, () => {
+      expect(meta.goldenOutputDeferred).toBe(false);
+    });
+  }
+});
+
 // ─── Tests: Golden output quality — no absolute machine paths ────────
 
 describe('Z07-D03 golden output quality — no absolute machine paths', () => {
