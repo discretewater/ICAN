@@ -24,7 +24,9 @@ allow/deny decisions with human-readable output and reproducible results.
   - `3` — unsupported feature or indeterminate result
   - `4` — implicitly denied (no applicable Allow)
   - `10` — internal error
-- Run as a local CLI command: `ican check`
+- The `package.json` `bin` field registers `ican` as the CLI name. Before
+packaging or linking, the examples below use `node dist/cli/ican.js check`
+directly.
 
 ## What S01 Does Not Do
 
@@ -115,7 +117,8 @@ or `/tmp/`) and are portable across environments.
 
 ## Project Boundaries
 
-- **No real IAM policy samples, ARNs, or account IDs**
+- **No real-world IAM policy samples, real AWS account IDs, or organization-specific ARNs**
+- All ARNs in examples and fixtures are synthetic placeholders
 - All fixtures are synthetic and minimal
 - The purpose of this project is engineering demonstration and
   skill verification, not a production IAM service
