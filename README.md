@@ -24,7 +24,7 @@ allow/deny decisions with human-readable output and reproducible results.
   - `3` — unsupported feature or indeterminate result
   - `4` — implicitly denied (no applicable Allow)
   - `10` — internal error
-- The `package.json` `bin` field registers `ican` as the CLI name. Before
+- Read the [Usage Guide](docs/usage.md) for a full walkthrough. The `package.json` `bin` field registers `ican` as the CLI name. Before
 packaging or linking, the examples below use `node dist/cli/ican.js check`
 directly.
 
