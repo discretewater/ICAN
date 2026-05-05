@@ -228,15 +228,9 @@ The golden output files serve as a regression baseline:
 3. Any change to the actual output will fail the comparison test
 4. This catches unintended semantic changes before they proliferate
 
-To regenerate golden outputs (only when intentional changes are made and
-approved), use:
-
-```bash
-node dist/cli/scripts/generate-golden-outputs.js
-```
-
-⚠️ Do not regenerate golden outputs without explicit approval — they are a
-stable acceptance baseline.
+Golden outputs are a stable acceptance baseline. They must not be regenerated
+unless a future task explicitly authorizes semantic changes and golden-output
+regeneration.
 
 ---
 

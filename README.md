@@ -24,7 +24,7 @@ allow/deny decisions with human-readable output and reproducible results.
   - `3` — unsupported feature or indeterminate result
   - `4` — implicitly denied (no applicable Allow)
   - `10` — internal error
-- - [Usage Guide](docs/usage.md) — full CLI walkthrough
+- [Usage Guide](docs/usage.md) — full CLI walkthrough
 - [Examples & Fixtures](docs/examples.md) — fixture cases and golden outputs
 
 The `package.json` `bin` field registers `ican` as the CLI name. Before
