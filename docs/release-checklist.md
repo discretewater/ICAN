@@ -2,7 +2,9 @@
 
 This checklist provides a structured pre-release verification for ICAN S01.
 It does NOT authorize pushing to Codeberg or creating a release tag —
-those actions require separate approval from the project commander.
+those actions are executed by the project commander / user, not by the
+development team. The development team only prepares release candidate
+materials.
 
 ---
 
@@ -66,12 +68,15 @@ those actions require separate approval from the project commander.
 - [ ] Main repository `ling` branch is up-to-date
 - [ ] Workshop repository `main` branch is up-to-date
 
-### 8. Codeberg Push Readiness (Verification Only — DO NOT PUSH)
+### 8. Codeberg Push Readiness — Commander-Only Execution
+
+**Codeberg push is executed by the project commander / user. The development team must NOT push to Codeberg, must NOT create release tags, and only prepares release candidate materials. After the push is completed, the commander may notify the development team at their discretion.**
 
 - [ ] All checklist items above pass
-- [ ] No release tag has been created
-- [ ] Codeberg has NOT been pushed to
+- [ ] No release tag has been created by the development team
+- [ ] Codeberg has NOT been pushed to by the development team
 - [ ] Project commander approval has NOT yet been obtained for push
+- [ ] Development team understands: push is commander-executed, not team-executed
 - [ ] RC01-D05 (security review) is NOT yet started
 - [ ] RC01-D06 (release candidate final review) is NOT yet started
 - [ ] S02 is NOT yet started
