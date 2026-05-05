@@ -26,6 +26,8 @@ allow/deny decisions with human-readable output and reproducible results.
   - `10` — internal error
 - [Usage Guide](docs/usage.md) — full CLI walkthrough
 - [Examples & Fixtures](docs/examples.md) — fixture cases and golden outputs
+- [Release Checklist](docs/release-checklist.md) — pre-release verification
+- [Technical Debt](docs/technical-debt.md) — known debt register
 
 The `package.json` `bin` field registers `ican` as the CLI name. Before
 packaging or linking, the examples below use `node dist/cli/ican.js check`
