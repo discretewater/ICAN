@@ -133,7 +133,7 @@ or `/tmp/`) and are portable across environments.
 
 ## License
 
-See [LICENSE](./LICENSE). This is a private project in its initial phase.
+Licensed under the Apache License, Version 2.0. See [LICENSE](./LICENSE) for the full text.
 
 ---
 
