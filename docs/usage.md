@@ -5,6 +5,26 @@ end-to-end. It assumes you have already read the project [README](../README.md).
 
 ---
 
+## npm & Bun Usage
+
+Once the `@wizardelf/ican` package is published:
+
+```bash
+# npm global install
+npm install -g @wizardelf/ican
+ican check --help
+
+# npx (no install)
+npx @wizardelf/ican check --help
+
+# Bun (npm-compatible)
+bun add -g @wizardelf/ican
+bunx @wizardelf/ican check --help
+```
+
+Until published, run via local build (see Quick Start in [README](../README.md)).
+---
+
 ## Prerequisites & Installation
 
 ```bash

@@ -92,3 +92,22 @@ materials.
 - [ ] `tests/` have not been modified
 - [ ] `test-fixtures/` have not been modified except for approved golden output generation
 - [ ] `设计/`, `规范/`, `参考/` have not been modified by development team
+
+### 9. NPM Distribution Readiness (Local Only)
+
+- [ ] `package.json` name is `@wizardelf/ican`
+- [ ] `package.json` version is suitable (e.g. `0.1.0`)
+- [ ] `package.json` `bin` field exposes `ican`
+- [ ] `package.json` `files` field restricts published content
+- [ ] `package.json` `license` is `Apache-2.0`
+- [ ] `npm run typecheck` passes
+- [ ] `npm run test -- --run` passes
+- [ ] `npm run build` passes
+- [ ] `npm pack --dry-run` succeeds
+- [ ] `npm pack` produces a tarball
+- [ ] Local tarball install and CLI verification succeeds
+- [ ] Bun local verification succeeds (or reason noted for absence)
+- [ ] `npm publish` has NOT been executed
+- [ ] No npm token has been created
+- [ ] No release tag has been created
+- [ ] Codeberg has NOT been pushed by the development team

@@ -54,8 +54,18 @@ directly.
 ### Install Dependencies
 
 ```bash
-npm install
+npm install         # Install all dependencies
 ```
+
+### From npm (when published)
+
+```bash
+npm install -g @wizardelf/ican   # Global install
+npx @wizardelf/ican check --help  # Or via npx
+```
+
+> The npm package is published manually by the project maintainer.
+> Until published, use the local development setup below.
 
 ### Run Tests
 
