@@ -1,5 +1,10 @@
 # ICAN — Local-first IAM Policy Evaluation MVP
 
+[![npm version](https://img.shields.io/npm/v/@wizardelf/ican.svg)](https://www.npmjs.com/package/@wizardelf/ican)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](./LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-supported-brightgreen.svg)](https://nodejs.org/)
+[![Bun](https://img.shields.io/badge/Bun-npm--compatible_usage-informational.svg)](https://bun.sh/)
+
 ICAN is a local-first, test-driven IAM policy evaluation engine.
 It takes IAM policy documents and access requests, evaluates them through
 a statement-by-statement matching pipeline, and returns structured
@@ -57,15 +62,18 @@ directly.
 npm install         # Install all dependencies
 ```
 
-### From npm (when published)
+### From npm (published — `@wizardelf/ican@0.1.0`)
 
 ```bash
-npm install -g @wizardelf/ican   # Global install
-npx @wizardelf/ican check --help  # Or via npx
+npm install @wizardelf/ican         # Install in your project
+npx @wizardelf/ican check --help    # Or run directly via npx
+
+# Global install (optional)
+npm install -g @wizardelf/ican
+ican check --help
 ```
 
-> The npm package is published manually by the project maintainer.
-> Until published, use the local development setup below.
+### For Development
 
 ### Run Tests
 

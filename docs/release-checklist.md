@@ -111,3 +111,18 @@ materials.
 - [ ] No npm token has been created
 - [ ] No release tag has been created
 - [ ] Codeberg has NOT been pushed by the development team
+
+### 10. Post-Publish Verification (Commander-Only)
+
+- [ ] `npm view @wizardelf/ican version` returns `0.1.0`
+- [ ] `npm view @wizardelf/ican` shows expected metadata
+- [ ] Temporary directory `npm install @wizardelf/ican` succeeds
+- [ ] `npx ican check --help` outputs usage/help
+- [ ] Temporary `.npmrc` has been cleaned up
+- [ ] `NPM_TOKEN` environment variable has been cleared
+- [ ] Temporary Granular Access Token has been revoked
+- [ ] No release tag has been created by the development team
+- [ ] `npm publish` has NOT been executed by the development team
+- [ ] No npm token has been created by the development team
+- [ ] Codeberg has NOT been pushed by the development team
+- [ ] S02 has NOT been started

@@ -7,22 +7,28 @@ end-to-end. It assumes you have already read the project [README](../README.md).
 
 ## npm & Bun Usage
 
-Once the `@wizardelf/ican` package is published:
+The `@wizardelf/ican` package is published on npm (`v0.1.0`):
 
 ```bash
-# npm global install
+# npm install
+npm install @wizardelf/ican
+npx ican check --help
+
+# Global install
 npm install -g @wizardelf/ican
 ican check --help
 
-# npx (no install)
-npx @wizardelf/ican check --help
-
-# Bun (npm-compatible)
-bun add -g @wizardelf/ican
+# Bun (npm-compatible workflow)
+bun add @wizardelf/ican
 bunx @wizardelf/ican check --help
 ```
 
-Until published, run via local build (see Quick Start in [README](../README.md)).
+> Bun users may consume the published npm package through Bun's
+> npm-compatible workflow. This release does not claim a separate
+> Bun runtime verification beyond the npm-compatible packaging path.
+
+For local development, see Quick Start in [README](../README.md).
+
 ---
 
 ## Prerequisites & Installation
